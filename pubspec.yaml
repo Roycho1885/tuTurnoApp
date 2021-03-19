@@ -1,0 +1,32 @@
+name: tuturnoapp
+description: A new Flutter project.
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_auth: ^1.0.1
+  firebase_core: ^1.0.1
+
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  uses-material-design: true
+  assets:
+      - assets/images/logo.png
+      - assets/images/logogris.png
+  fonts:
+    - family: Rubik
+      fonts:
+        - asset: assets/fonts/Rubik-SemiBold.ttf
