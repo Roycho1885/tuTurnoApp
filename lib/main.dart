@@ -139,7 +139,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                           login();
                         }
                       },
-                      child: Text('Iniciar Sesión'),
+                      child: Text('Iniciar Sesión aqui'),
                     ),
                   ),
                   SizedBox(
