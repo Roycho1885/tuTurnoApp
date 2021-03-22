@@ -6,8 +6,73 @@ class PrincipalUsuario extends StatefulWidget {
 }
 
 class _PrincipalUsuarioState extends State<PrincipalUsuario> {
-  @override
-  Widget build(BuildContext context) {
+  Widget _pantallaGrande() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Pantalla Usuario'),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: <Color>[
+                      Colors.black,
+                      Colors.indigo,
+                      Colors.indigoAccent
+                    ],
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                      child: Image.asset(
+                        'assets/images/logogris.png',
+                        width: 140,
+                        height: 140,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      child: Text('tu Turno App',
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 16.0)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Container(
+                width: 250,
+                height: 300,
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    PersonalListTile(Icons.home, "Home", () => {}),
+                    PersonalListTile(Icons.list, "Mi turno", () => {}),
+                    PersonalListTile(Icons.settings, "Configuración", () => {}),
+                    PersonalListTile(Icons.email, "Contacto", () => {}),
+                    PersonalListTile(Icons.phone_android, "Acerca de", () => {})
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pantallaChica() {
     return Scaffold(
       appBar: AppBar(
         title: Text('Pantalla Usuario'),
@@ -49,6 +114,17 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
         ]),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
+
+    if (_width > 640) {
+      return _pantallaGrande();
+    } else {
+      return _pantallaChica();
+    }
   }
 }
 
