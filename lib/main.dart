@@ -16,7 +16,10 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'tuTurno',
       theme: ThemeData(primarySwatch: Colors.indigo, fontFamily: 'Rubik'),
-      home: PantallaInicial(),
+      routes: {
+        '/': (context) => PantallaInicial(),
+        '/prinUsuario': (context) => PrincipalUsuario(),
+      },
     );
   }
 }
@@ -315,8 +318,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
           .user;
 
       Navigator.pop(context);
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => PrincipalUsuario()));
+      Navigator.of(context).pushNamed('/prinUsuario');
 
       _formkey.currentState.reset();
     } on FirebaseAuthException catch (e) {
