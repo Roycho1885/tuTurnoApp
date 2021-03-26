@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'Paginas/user_principal.dart';
 import 'Widgets/progressDialog.dart';
 
@@ -19,6 +20,7 @@ class App extends StatelessWidget {
       routes: {
         '/': (context) => PantallaInicial(),
         '/prinUsuario': (context) => PrincipalUsuario(),
+        '/registro': (context) => Registrar(),
       },
     );
   }
@@ -143,7 +145,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
                   style: OutlinedButton.styleFrom(
                     shape: StadiumBorder(),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/registro');
+                  },
                   child: Text('Registrarse'),
                 ),
               ),
@@ -226,43 +230,39 @@ class _PantallaInicialState extends State<PantallaInicial> {
                   margin: EdgeInsets.fromLTRB(50, 10, 50, 20),
                   child: crearCheck(),
                 ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      //ACA SE INICIA SESION AL USUARIO
-                      if (_formkey.currentState.validate()) {
-                        showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return ProgressDialog(
-                                mensaje: 'Accediendo\nEspera por favor...',
-                              );
-                            });
-                        login();
-                      }
-                    },
-                    child: Text('Iniciar Sesión'),
+                ElevatedButton(
+                  style: OutlinedButton.styleFrom(
+                    shape: StadiumBorder(),
+                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 90),
                   ),
+                  onPressed: () {
+                    //ACA SE INICIA SESION AL USUARIO
+                    if (_formkey.currentState.validate()) {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return ProgressDialog(
+                              mensaje: 'Accediendo\nEspera por favor...',
+                            );
+                          });
+                      login();
+                    }
+                  },
+                  child: Text('Iniciar Sesión'),
                 ),
                 SizedBox(
                   height: 8,
                 ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {},
-                    child: Text('Registrarse'),
+                ElevatedButton(
+                  style: OutlinedButton.styleFrom(
+                    shape: StadiumBorder(),
+                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 90),
                   ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/registro');
+                  },
+                  child: Text('Registrarse'),
                 ),
                 SizedBox(
                   height: 8,
