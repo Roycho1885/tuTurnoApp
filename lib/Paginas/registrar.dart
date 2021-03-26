@@ -215,18 +215,21 @@ class _RegistrarState extends State<Registrar> {
                 SizedBox(
                   height: 50,
                 ),
-                ElevatedButton(
-                  child: Text('Registrar'),
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 90),
-                    shape: StadiumBorder(),
+                Container(
+                  width: 260,
+                  height: 50,
+                  child: ElevatedButton(
+                    child: Text('Registrar'),
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      if (!_formkey.currentState.validate()) {
+                        return;
+                      }
+                      _formkey.currentState.save();
+                    },
                   ),
-                  onPressed: () {
-                    if (!_formkey.currentState.validate()) {
-                      return;
-                    }
-                    _formkey.currentState.save();
-                  },
                 ),
               ],
             ),
@@ -275,18 +278,21 @@ class _RegistrarState extends State<Registrar> {
                 SizedBox(
                   height: 50,
                 ),
-                ElevatedButton(
-                  child: Text('Registrar'),
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 90),
-                    shape: StadiumBorder(),
+                Container(
+                  width: 260,
+                  height: 50,
+                  child: ElevatedButton(
+                    child: Text('Registrar'),
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      if (!_formkey.currentState.validate()) {
+                        return;
+                      }
+                      _formkey.currentState.save();
+                    },
                   ),
-                  onPressed: () {
-                    if (!_formkey.currentState.validate()) {
-                      return;
-                    }
-                    _formkey.currentState.save();
-                  },
                 ),
               ],
             ),

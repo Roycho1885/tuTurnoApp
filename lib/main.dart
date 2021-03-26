@@ -230,39 +230,45 @@ class _PantallaInicialState extends State<PantallaInicial> {
                   margin: EdgeInsets.fromLTRB(50, 10, 50, 20),
                   child: crearCheck(),
                 ),
-                ElevatedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: StadiumBorder(),
-                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 90),
+                Container(
+                  width: 260,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      //ACA SE INICIA SESION AL USUARIO
+                      if (_formkey.currentState.validate()) {
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return ProgressDialog(
+                                mensaje: 'Accediendo\nEspera por favor...',
+                              );
+                            });
+                        login();
+                      }
+                    },
+                    child: Text('Iniciar Sesión'),
                   ),
-                  onPressed: () {
-                    //ACA SE INICIA SESION AL USUARIO
-                    if (_formkey.currentState.validate()) {
-                      showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return ProgressDialog(
-                              mensaje: 'Accediendo\nEspera por favor...',
-                            );
-                          });
-                      login();
-                    }
-                  },
-                  child: Text('Iniciar Sesión'),
                 ),
                 SizedBox(
                   height: 8,
                 ),
-                ElevatedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: StadiumBorder(),
-                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 90),
+                Container(
+                  width: 260,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/registro');
+                    },
+                    child: Text('Registrarse'),
                   ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/registro');
-                  },
-                  child: Text('Registrarse'),
                 ),
                 SizedBox(
                   height: 8,
