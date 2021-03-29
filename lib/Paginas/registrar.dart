@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Registrar extends StatefulWidget {
   @override
@@ -6,6 +8,8 @@ class Registrar extends StatefulWidget {
 }
 
 class _RegistrarState extends State<Registrar> {
+  bool value = false;
+  var _valorselecc;
   String _nombre;
   String _apellido;
   String _dni;
@@ -18,6 +22,11 @@ class _RegistrarState extends State<Registrar> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   bool _ocultar = true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void _toogleboton() {
     setState(() {
@@ -160,8 +169,62 @@ class _RegistrarState extends State<Registrar> {
   }
 
   Widget _crearCampoGym() {
-    return null;
+    return StreamBuilder<QuerySnapshot>(
+        stream:
+            FirebaseFirestore.instance.collection('clientesList').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          List<DropdownMenuItem> gim = [];
+          for (int i = 0; i < snapshot.data.docs.length; i++) {
+            DocumentSnapshot docs = snapshot.data.docs[i];
+            gim.add(
+              DropdownMenuItem(
+                child: Text(
+                  docs['nombre'],
+                ),
+                value: '${docs.id}',
+              ),
+            );
+          }
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              DropdownButton(
+                  items: gim,
+                  onChanged: (valor) {
+                    setState(() {
+                      this._valorselecc = valor;
+                    });
+                  },
+                  isExpanded: false,
+                  value: _valorselecc,
+                  hint: new Text('Seleccione Gimnasio')),
+            ],
+          );
+        });
   }
+
+  //ESTE ES EL CHECKBOX POLITICAS
+  Widget crearCheck() => CheckboxListTile(
+      title: GestureDetector(
+        child: Text(
+          'Acepto las Políticas de Privacidad',
+          style: TextStyle(
+              decoration: TextDecoration.underline, color: Colors.blue),
+        ),
+        onTap: () =>
+            launch('https://tuturno.web.app/Pol%C3%ADticas-de-Privacidad.html'),
+      ),
+      value: value,
+      onChanged: (value) {
+        setState(() {
+          this.value = value;
+        });
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -188,32 +251,35 @@ class _RegistrarState extends State<Registrar> {
               children: <Widget>[
                 _crearCampoNombre(),
                 SizedBox(
-                  height: 20,
+                  height: 40,
                 ),
                 _crearCampoApellido(),
                 SizedBox(
-                  height: 20,
+                  height: 40,
                 ),
                 _crearCampoDni(),
                 SizedBox(
-                  height: 20,
+                  height: 40,
                 ),
                 _crearCampoDireccion(),
                 SizedBox(
-                  height: 20,
+                  height: 40,
                 ),
                 _crearCampoEmail(),
                 SizedBox(
-                  height: 20,
+                  height: 40,
                 ),
                 _crearCampoContrasena(),
                 SizedBox(
-                  height: 20,
+                  height: 40,
                 ),
-                /*_crearCampoGym(),*/
+                _crearCampoGym(),
+                SizedBox(
+                  height: 40,
+                ),
                 _crearCampoCodigo(),
                 SizedBox(
-                  height: 50,
+                  height: 40,
                 ),
                 Container(
                   width: 260,
@@ -226,11 +292,21 @@ class _RegistrarState extends State<Registrar> {
                     onPressed: () {
                       if (!_formkey.currentState.validate()) {
                         return;
+                      } else {
+                        if (_valorselecc == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Seleccione un gimnasio')));
+                          return;
+                        }
                       }
                       _formkey.currentState.save();
                     },
                   ),
                 ),
+                SizedBox(
+                  height: 20,
+                ),
+                crearCheck(),
               ],
             ),
           ),
@@ -251,29 +327,32 @@ class _RegistrarState extends State<Registrar> {
               children: <Widget>[
                 _crearCampoNombre(),
                 SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
                 _crearCampoApellido(),
                 SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
                 _crearCampoDni(),
                 SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
                 _crearCampoDireccion(),
                 SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
                 _crearCampoEmail(),
                 SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
                 _crearCampoContrasena(),
                 SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
-                /*_crearCampoGym(),*/
+                _crearCampoGym(),
+                SizedBox(
+                  height: 30,
+                ),
                 _crearCampoCodigo(),
                 SizedBox(
                   height: 50,
@@ -294,6 +373,10 @@ class _RegistrarState extends State<Registrar> {
                     },
                   ),
                 ),
+                SizedBox(
+                  height: 20,
+                ),
+                crearCheck(),
               ],
             ),
           ),
