@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Registrar extends StatefulWidget {
@@ -8,8 +10,7 @@ class Registrar extends StatefulWidget {
 }
 
 class _RegistrarState extends State<Registrar> {
-  bool value = false;
-  var _valorselecc;
+  bool poli = false;
   String _nombre;
   String _apellido;
   String _dni;
@@ -18,6 +19,7 @@ class _RegistrarState extends State<Registrar> {
   String _contrasena;
   String _codigo;
   String _gym;
+  String _rubro;
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
@@ -36,6 +38,7 @@ class _RegistrarState extends State<Registrar> {
 
   Widget _crearCampoNombre() {
     return TextFormField(
+      keyboardType: TextInputType.text,
       decoration:
           InputDecoration(labelText: 'Nombre', prefixIcon: Icon(Icons.person)),
       validator: (String value) {
@@ -45,13 +48,14 @@ class _RegistrarState extends State<Registrar> {
         return null;
       },
       onSaved: (String value) {
-        _nombre = value;
+        _nombre = value.trim();
       },
     );
   }
 
   Widget _crearCampoApellido() {
     return TextFormField(
+      keyboardType: TextInputType.text,
       decoration: InputDecoration(
           labelText: 'Apellido', prefixIcon: Icon(Icons.person)),
       validator: (String value) {
@@ -61,7 +65,7 @@ class _RegistrarState extends State<Registrar> {
         return null;
       },
       onSaved: (String value) {
-        _apellido = value;
+        _apellido = value.trim();
       },
     );
   }
@@ -79,13 +83,14 @@ class _RegistrarState extends State<Registrar> {
         return null;
       },
       onSaved: (String value) {
-        _dni = value;
+        _dni = value.trim();
       },
     );
   }
 
   Widget _crearCampoDireccion() {
     return TextFormField(
+      keyboardType: TextInputType.text,
       decoration: InputDecoration(
           labelText: 'Dirección', prefixIcon: Icon(Icons.person)),
       validator: (String value) {
@@ -95,7 +100,7 @@ class _RegistrarState extends State<Registrar> {
         return null;
       },
       onSaved: (String value) {
-        _direccion = value;
+        _direccion = value.trim();
       },
     );
   }
@@ -121,7 +126,7 @@ class _RegistrarState extends State<Registrar> {
         return null;
       },
       onSaved: (String value) {
-        _email = value;
+        _email = value.trim();
       },
     );
   }
@@ -145,7 +150,7 @@ class _RegistrarState extends State<Registrar> {
         return null;
       },
       onSaved: (String value) {
-        _contrasena = value;
+        _contrasena = value.trim();
       },
     );
   }
@@ -163,12 +168,12 @@ class _RegistrarState extends State<Registrar> {
         return null;
       },
       onSaved: (String value) {
-        _direccion = value;
+        _codigo = value.trim();
       },
     );
   }
 
-  Widget _crearCampoGym() {
+  Widget _crearCampoRubro() {
     return StreamBuilder<QuerySnapshot>(
         stream:
             FirebaseFirestore.instance.collection('clientesList').snapshots(),
@@ -178,14 +183,12 @@ class _RegistrarState extends State<Registrar> {
               child: CircularProgressIndicator(),
             );
           }
-          List<DropdownMenuItem> gim = [];
+          List<DropdownMenuItem> rub = [];
           for (int i = 0; i < snapshot.data.docs.length; i++) {
             DocumentSnapshot docs = snapshot.data.docs[i];
-            gim.add(
+            rub.add(
               DropdownMenuItem(
-                child: Text(
-                  docs['nombre'],
-                ),
+                child: Text(docs.id),
                 value: '${docs.id}',
               ),
             );
@@ -194,18 +197,74 @@ class _RegistrarState extends State<Registrar> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               DropdownButton(
-                  items: gim,
+                  items: rub,
                   onChanged: (valor) {
                     setState(() {
-                      this._valorselecc = valor;
+                      this._rubro = valor;
                     });
                   },
                   isExpanded: false,
-                  value: _valorselecc,
-                  hint: new Text('Seleccione Gimnasio')),
+                  value: _rubro,
+                  hint: new Text('Seleccione Rubro')),
             ],
           );
         });
+  }
+
+  Widget _crearCampoGym() {
+    if (_rubro == null) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          DropdownButton(
+              items: null,
+              isExpanded: false,
+              hint: new Text('Seleccione primero un Rubro')),
+        ],
+      );
+    } else {
+      return StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('clientesList')
+              .doc(_rubro)
+              .collection(_rubro)
+              .orderBy('nombre')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            List<DropdownMenuItem> gim = [];
+            for (int i = 0; i < snapshot.data.docs.length; i++) {
+              DocumentSnapshot docs = snapshot.data.docs[i];
+              gim.add(
+                DropdownMenuItem(
+                  child: Text(
+                    docs['nombre'],
+                  ),
+                  value: '${docs.get('nombre')}',
+                ),
+              );
+            }
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                DropdownButton(
+                    items: gim,
+                    onChanged: (valor) {
+                      setState(() {
+                        this._gym = valor;
+                      });
+                    },
+                    isExpanded: false,
+                    value: _gym,
+                    hint: new Text('Seleccione ' + _rubro)),
+              ],
+            );
+          });
+    }
   }
 
   //ESTE ES EL CHECKBOX POLITICAS
@@ -219,10 +278,10 @@ class _RegistrarState extends State<Registrar> {
         onTap: () =>
             launch('https://tuturno.web.app/Pol%C3%ADticas-de-Privacidad.html'),
       ),
-      value: value,
+      value: poli,
       onChanged: (value) {
         setState(() {
-          this.value = value;
+          this.poli = value;
         });
       });
 
@@ -273,6 +332,10 @@ class _RegistrarState extends State<Registrar> {
                 SizedBox(
                   height: 40,
                 ),
+                _crearCampoRubro(),
+                SizedBox(
+                  height: 40,
+                ),
                 _crearCampoGym(),
                 SizedBox(
                   height: 40,
@@ -293,13 +356,22 @@ class _RegistrarState extends State<Registrar> {
                       if (!_formkey.currentState.validate()) {
                         return;
                       } else {
-                        if (_valorselecc == null) {
+                        if (_gym == null) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text('Seleccione un gimnasio')));
                           return;
+                        } else {
+                          if (!poli) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    'Debe aceptar las Políticas de Privacidad')));
+                            return;
+                          }
                         }
                       }
                       _formkey.currentState.save();
+                      registrar(_nombre, _apellido, _dni, _direccion, _email,
+                          _contrasena, _gym, _codigo, context);
                     },
                   ),
                 ),
@@ -349,6 +421,8 @@ class _RegistrarState extends State<Registrar> {
                 SizedBox(
                   height: 30,
                 ),
+                _crearCampoRubro(),
+                SizedBox(height: 30),
                 _crearCampoGym(),
                 SizedBox(
                   height: 30,
@@ -368,8 +442,24 @@ class _RegistrarState extends State<Registrar> {
                     onPressed: () {
                       if (!_formkey.currentState.validate()) {
                         return;
+                      } else {
+                        if (_gym == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Seleccione un gimnasio')));
+                          return;
+                        } else {
+                          if (!poli) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    'Debe aceptar las Políticas de Privacidad')));
+                            return;
+                          }
+                        }
                       }
                       _formkey.currentState.save();
+                      comprobarcodigo(_gym, _codigo);
+                      /*registrar(_nombre, _apellido, _dni, _direccion, _email,
+                          _contrasena, _gym, _codigo, context);*/
                     },
                   ),
                 ),
@@ -384,4 +474,63 @@ class _RegistrarState extends State<Registrar> {
       ),
     );
   }
+}
+
+Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena, gym,
+    codigo, context) async {
+  final clienteNuevo = Cliente(nombre, apellido, dni, direccion, email, gym,
+      'No', 'Nada', 'Nada', 'Nada', 0);
+
+  CollectionReference clinuevo =
+      FirebaseFirestore.instance.collection('clientesPrincipal');
+
+  try {
+    UserCredential userCreden = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: contrasena);
+
+    validarcliente();
+    return clinuevo
+        .doc('cli_gym')
+        .collection(gym)
+        .add(clienteNuevo.toJson())
+        .then((value) => ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Cliente registrado con éxito'))));
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'weak-password') {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('La contraseña debe contener al menos 6 caracteres')));
+    } else {
+      if (e.code == 'email-already-in-use') {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Email utilizado en una cuenta existente')));
+      }
+    }
+  } catch (e) {
+    print(e);
+  }
+}
+
+Future<void> validarcliente() async {
+  User clienteEmail = FirebaseAuth.instance.currentUser;
+  if (!clienteEmail.emailVerified) {
+    await clienteEmail.sendEmailVerification();
+  }
+}
+
+void comprobarcodigo(String nombrelocal, String codigolocal) {
+  bool verdadero = false;
+  FirebaseFirestore.instance
+      .collection('clientesList')
+      .doc('rubros')
+      .collection('gimnasios')
+      .get()
+      .then((QuerySnapshot query) {
+    query.docs.forEach((doc) {
+      if (nombrelocal == doc['nombre'] && codigolocal == doc['codigoacceso']) {
+        verdadero = true;
+      }
+      print(verdadero);
+      return verdadero;
+    });
+  });
 }

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'Paginas/user_principal.dart';
 import 'Widgets/progressDialog.dart';
@@ -21,6 +22,7 @@ class App extends StatelessWidget {
         '/': (context) => PantallaInicial(),
         '/prinUsuario': (context) => PrincipalUsuario(),
         '/registro': (context) => Registrar(),
+        '/olvicontra': (context) => OlvidePass(),
       },
     );
   }
@@ -161,7 +163,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
                   style: OutlinedButton.styleFrom(
                     shape: StadiumBorder(),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/olvicontra');
+                  },
                   child: Text('¿Olvidaste tu contraseña?'),
                 ),
               ),
@@ -280,7 +284,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
                     style: OutlinedButton.styleFrom(
                       shape: StadiumBorder(),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/olvicontra');
+                    },
                     child: Text('¿Olvidaste tu contraseña?'),
                   ),
                 ),
@@ -298,7 +304,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('tuTurno'),
+        title: Text('tu Turno'),
       ),
       body: Center(
         child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
@@ -320,7 +326,8 @@ class _PantallaInicialState extends State<PantallaInicial> {
   void login() async {
     try {
       final User user = (await _auth.signInWithEmailAndPassword(
-              email: _controlUsuario.text, password: _controlContra.text))
+              email: _controlUsuario.text.trim(),
+              password: _controlContra.text.trim()))
           .user;
 
       Navigator.pop(context);

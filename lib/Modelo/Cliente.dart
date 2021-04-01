@@ -1,5 +1,4 @@
 class Cliente {
-  String _id;
   String _nombre;
   String _apellido;
   String _dni;
@@ -13,7 +12,6 @@ class Cliente {
   int _estadopago;
 
   Cliente(
-      this._id,
       this._nombre,
       this._apellido,
       this._dni,
@@ -31,9 +29,19 @@ class Cliente {
   Cliente.modi1(this._apellido, this._nombre, this._ultimopago,
       this._fechavencimiento, this._estadopago);
 
-  set id(String id) {
-    this._id = id;
-  }
+  Map<String, dynamic> toJson() => {
+        'nombre': nombre,
+        'apellido': apellido,
+        'dni': dni,
+        'direccion': direccion,
+        'email': email,
+        'gym': gym,
+        'admin': admin,
+        'token': token,
+        'ultimopago': ultimopago,
+        'fechavencimiento': fechavencimiento,
+        'estadopago': estadopago,
+      };
 
   set nombre(String nombre) {
     this._nombre = nombre;
@@ -79,7 +87,6 @@ class Cliente {
     this._estadopago = estadopago;
   }
 
-  String get id => this._id;
   String get nombre => this._nombre;
   String get apellido => this._apellido;
   String get dni => this._dni;
