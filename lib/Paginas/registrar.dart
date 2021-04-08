@@ -25,7 +25,7 @@ class _RegistrarState extends State<Registrar> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   bool _ocultar = true;
-  String rubrosselec, gimselec;
+  String rubrosselec, gimselec, selrubro, selgim;
 
   @override
   void initState() {
@@ -36,10 +36,6 @@ class _RegistrarState extends State<Registrar> {
     setState(() {
       _ocultar = !_ocultar;
     });
-  }
-
-  void _cambiodeopciones1(String opcion) {
-    setState(() {});
   }
 
   Widget _crearCampoNombre() {
@@ -197,12 +193,12 @@ class _RegistrarState extends State<Registrar> {
             itemBuilder: (context, index) {
               Map<String, dynamic> data = docs[index].data();
               return ListTile(
+                hoverColor: Colors.indigo,
                 title: Text(data['nombre']),
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text('Ah seleccionado ' + data['nombre'])));
                   rubrosselec = data['nombre'];
-                  print(rubrosselec);
                 },
               );
             },
@@ -213,46 +209,40 @@ class _RegistrarState extends State<Registrar> {
   }
 
   Widget _crearCampoGym() {
-    if (rubrosselec == null) {
-      return Center(
-        child: Text('Seleccione un Rubro'),
-      );
-    } else {
-      return StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('clientesList')
-              .doc(rubrosselec)
-              .collection(rubrosselec)
-              .orderBy('nombre')
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            List<DocumentSnapshot> docs = snapshot.data.docs;
-            return Container(
-              height: 200,
-              width: 100,
-              child: ListView.builder(
-                itemCount: docs.length,
-                itemBuilder: (context, index) {
-                  Map<String, dynamic> data = docs[index].data();
-                  return ListTile(
-                    title: Text(data['nombre']),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Ah seleccionado ' + data['nombre'])));
-                      gimselec = data['nombre'];
-                      print(gimselec);
-                    },
-                  );
-                },
-              ),
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('clientesList')
+            .doc(rubrosselec)
+            .collection(rubrosselec)
+            .orderBy('nombre')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: CircularProgressIndicator(),
             );
-          });
-    }
+          }
+          List<DocumentSnapshot> docs = snapshot.data.docs;
+          return Container(
+            height: 200,
+            width: 100,
+            child: ListView.builder(
+              itemCount: docs.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> data = docs[index].data();
+                return ListTile(
+                  hoverColor: Colors.indigo,
+                  title: Text(data['nombre']),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Ah seleccionado ' + data['nombre'])));
+                    gimselec = data['nombre'];
+                  },
+                );
+              },
+            ),
+          );
+        });
   }
 
   //CHECKBOX POLITICAS
@@ -320,52 +310,121 @@ class _RegistrarState extends State<Registrar> {
                 SizedBox(
                   height: 40,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text('Seleccione Rubro'),
-                        content: _crearCampoRubro(),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {},
-                            child: Text('Aceptar'),
+                Container(
+                  width: 260,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            'Rubros',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.blueGrey,
+                            ),
                           ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text('Cancelar'),
-                          ),
-                        ],
+                          content: _crearCampoRubro(),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  selrubro = rubrosselec;
+                                });
+                                Navigator.of(context).pop('Ok');
+                              },
+                              child: Text('Ok'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: Text('Seleccione rubro'),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  selrubro == null ? '' : selrubro,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.indigo,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        offset: Offset(1, 1),
+                        blurRadius: 8,
                       ),
-                    );
-                  },
-                  child: Text('Seleccione un rubro'),
+                    ],
+                  ),
                 ),
                 SizedBox(
                   height: 40,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text('Seleccione una opcion'),
-                        content: _crearCampoGym(),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {},
-                            child: Text('Aceptar'),
+                Container(
+                  width: 260,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      if (rubrosselec == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Primero seleccione un rubro')));
+                      } else {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(
+                              rubrosselec,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.blueGrey,
+                              ),
+                            ),
+                            content: _crearCampoGym(),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    selgim = gimselec;
+                                  });
+                                  Navigator.of(context).pop('Ok');
+                                },
+                                child: Text('Ok'),
+                              ),
+                            ],
                           ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text('Cancelar'),
-                          ),
-                        ],
+                        );
+                      }
+                    },
+                    child: Text('Seleccione una opcion'),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  selgim == null ? '' : selgim,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.indigo,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        offset: Offset(1, 1),
+                        blurRadius: 8,
                       ),
-                    );
-                  },
-                  child: Text('Seleccione un opcion'),
+                    ],
+                  ),
                 ),
                 SizedBox(
                   height: 40,
@@ -451,11 +510,70 @@ class _RegistrarState extends State<Registrar> {
                 SizedBox(
                   height: 30,
                 ),
-                _crearCampoRubro(),
-                SizedBox(
-                  height: 30,
+                Container(
+                  width: 260,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text('Seleccione Rubro'),
+                          content: _crearCampoRubro(),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop('Ok');
+                              },
+                              child: Text('Ok'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: Text('Seleccione rubro'),
+                  ),
                 ),
-                //_crearCampoGym(),
+                SizedBox(
+                  height: 40,
+                ),
+                Container(
+                  width: 260,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      if (rubrosselec == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Primero seleccione un rubro')));
+                      } else {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('Seleccione'),
+                            content: _crearCampoGym(),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop('Ok');
+                                },
+                                child: Text('Ok'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                    child: Text('Seleccione una opcion'),
+                  ),
+                ),
                 SizedBox(
                   height: 30,
                 ),
