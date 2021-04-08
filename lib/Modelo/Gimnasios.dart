@@ -1,25 +1,30 @@
 class Gimnasios {
-  String _nombre;
-  String _logo;
-  String _codigoacceso;
+  String nombre;
+  String logo;
+  String codigoacceso;
 
-  Gimnasios(this._nombre, this._logo, this._codigoacceso);
+  Gimnasios({this.nombre, this.logo, this.codigoacceso});
 
   Gimnasios.vacio();
 
-  set nombre(String nombre) {
-    this._nombre = nombre;
+  set setnombre(String nombre) {
+    this.nombre = nombre;
   }
 
-  set logo(String logo) {
-    this._logo = logo;
+  set setlogo(String logo) {
+    this.logo = logo;
   }
 
-  set codigoacceso(String codigoacceso) {
-    this._codigoacceso = codigoacceso;
+  set setcodigoacceso(String codigoacceso) {
+    this.codigoacceso = codigoacceso;
   }
 
-  String get nombre => this._nombre;
-  String get logo => this._logo;
-  String get codigoacceso => this._codigoacceso;
+  String get getnombre => this.nombre;
+  String get getlogo => this.logo;
+  String get getcodigoacceso => this.codigoacceso;
+
+  factory Gimnasios.fromMap(Map<String, dynamic> data) => Gimnasios(
+      nombre: data['nombre'],
+      logo: data['logo'],
+      codigoacceso: data['codigoacceso']);
 }

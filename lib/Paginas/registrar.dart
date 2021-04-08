@@ -11,6 +11,7 @@ class Registrar extends StatefulWidget {
 
 class _RegistrarState extends State<Registrar> {
   bool poli = false;
+  bool lista = false;
   String _nombre;
   String _apellido;
   String _dni;
@@ -24,6 +25,7 @@ class _RegistrarState extends State<Registrar> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   bool _ocultar = true;
+  String rubrosselec, gimselec;
 
   @override
   void initState() {
@@ -34,6 +36,10 @@ class _RegistrarState extends State<Registrar> {
     setState(() {
       _ocultar = !_ocultar;
     });
+  }
+
+  void _cambiodeopciones1(String opcion) {
+    setState(() {});
   }
 
   Widget _crearCampoNombre() {
@@ -175,59 +181,48 @@ class _RegistrarState extends State<Registrar> {
 
   Widget _crearCampoRubro() {
     return StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance.collection('clientesList').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          List<DropdownMenuItem> rub = [];
-          for (int i = 0; i < snapshot.data.docs.length; i++) {
-            DocumentSnapshot docs = snapshot.data.docs[i];
-            rub.add(
-              DropdownMenuItem(
-                child: Text(docs.id),
-                value: '${docs.id}',
-              ),
-            );
-          }
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              DropdownButton(
-                  items: rub,
-                  onChanged: (valor) {
-                    setState(() {
-                      this._rubro = valor;
-                    });
-                  },
-                  isExpanded: false,
-                  value: _rubro,
-                  hint: new Text('Seleccione Rubro')),
-            ],
+      stream: FirebaseFirestore.instance.collection('clientesList').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
           );
-        });
+        }
+        List<DocumentSnapshot> docs = snapshot.data.docs;
+        return Container(
+          height: 200,
+          width: 100,
+          child: ListView.builder(
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              Map<String, dynamic> data = docs[index].data();
+              return ListTile(
+                title: Text(data['nombre']),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Ah seleccionado ' + data['nombre'])));
+                  rubrosselec = data['nombre'];
+                  print(rubrosselec);
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   Widget _crearCampoGym() {
-    if (_rubro == null) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          DropdownButton(
-              items: null,
-              isExpanded: false,
-              hint: new Text('Seleccione primero un Rubro')),
-        ],
+    if (rubrosselec == null) {
+      return Center(
+        child: Text('Seleccione un Rubro'),
       );
     } else {
       return StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('clientesList')
-              .doc(_rubro)
-              .collection(_rubro)
+              .doc(rubrosselec)
+              .collection(rubrosselec)
               .orderBy('nombre')
               .snapshots(),
           builder: (context, snapshot) {
@@ -236,38 +231,31 @@ class _RegistrarState extends State<Registrar> {
                 child: CircularProgressIndicator(),
               );
             }
-            List<DropdownMenuItem> gim = [];
-            for (int i = 0; i < snapshot.data.docs.length; i++) {
-              DocumentSnapshot docs = snapshot.data.docs[i];
-              gim.add(
-                DropdownMenuItem(
-                  child: Text(
-                    docs['nombre'],
-                  ),
-                  value: '${docs.get('nombre')}',
-                ),
-              );
-            }
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                DropdownButton(
-                    items: gim,
-                    onChanged: (valor) {
-                      setState(() {
-                        this._gym = valor;
-                      });
+            List<DocumentSnapshot> docs = snapshot.data.docs;
+            return Container(
+              height: 200,
+              width: 100,
+              child: ListView.builder(
+                itemCount: docs.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> data = docs[index].data();
+                  return ListTile(
+                    title: Text(data['nombre']),
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Ah seleccionado ' + data['nombre'])));
+                      gimselec = data['nombre'];
+                      print(gimselec);
                     },
-                    isExpanded: false,
-                    value: _gym,
-                    hint: new Text('Seleccione ' + _rubro)),
-              ],
+                  );
+                },
+              ),
             );
           });
     }
   }
 
-  //ESTE ES EL CHECKBOX POLITICAS
+  //CHECKBOX POLITICAS
   Widget crearCheck() => CheckboxListTile(
       title: GestureDetector(
         child: Text(
@@ -332,11 +320,53 @@ class _RegistrarState extends State<Registrar> {
                 SizedBox(
                   height: 40,
                 ),
-                _crearCampoRubro(),
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Seleccione Rubro'),
+                        content: _crearCampoRubro(),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {},
+                            child: Text('Aceptar'),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: Text('Cancelar'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  child: Text('Seleccione un rubro'),
+                ),
                 SizedBox(
                   height: 40,
                 ),
-                _crearCampoGym(),
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Seleccione una opcion'),
+                        content: _crearCampoGym(),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {},
+                            child: Text('Aceptar'),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: Text('Cancelar'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  child: Text('Seleccione un opcion'),
+                ),
                 SizedBox(
                   height: 40,
                 ),
@@ -422,8 +452,10 @@ class _RegistrarState extends State<Registrar> {
                   height: 30,
                 ),
                 _crearCampoRubro(),
-                SizedBox(height: 30),
-                _crearCampoGym(),
+                SizedBox(
+                  height: 30,
+                ),
+                //_crearCampoGym(),
                 SizedBox(
                   height: 30,
                 ),
@@ -476,6 +508,7 @@ class _RegistrarState extends State<Registrar> {
   }
 }
 
+//METODO REGISTRAR CLIENTE
 Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena, gym,
     codigo, context) async {
   final clienteNuevo = Cliente(nombre, apellido, dni, direccion, email, gym,
@@ -510,6 +543,7 @@ Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena, gym,
   }
 }
 
+//ENVIO DE VALIDACION CLIENTE
 Future<void> validarcliente() async {
   User clienteEmail = FirebaseAuth.instance.currentUser;
   if (!clienteEmail.emailVerified) {
@@ -517,6 +551,7 @@ Future<void> validarcliente() async {
   }
 }
 
+//COMPRUEBO EL CODIGO DE ACCESO
 void comprobarcodigo(String nombrelocal, String codigolocal) {
   bool verdadero = false;
   FirebaseFirestore.instance
