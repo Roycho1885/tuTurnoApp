@@ -193,7 +193,8 @@ class _RegistrarState extends State<Registrar> {
             itemBuilder: (context, index) {
               Map<String, dynamic> data = docs[index].data();
               return ListTile(
-                hoverColor: Colors.indigo,
+                leading: Icon(Icons.done_outline),
+                hoverColor: Colors.amberAccent,
                 title: Text(data['nombre']),
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -231,7 +232,8 @@ class _RegistrarState extends State<Registrar> {
               itemBuilder: (context, index) {
                 Map<String, dynamic> data = docs[index].data();
                 return ListTile(
-                  hoverColor: Colors.indigo,
+                  leading: Icon(Icons.done_outline),
+                  hoverColor: Colors.amberAccent,
                   title: Text(data['nombre']),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -247,6 +249,7 @@ class _RegistrarState extends State<Registrar> {
 
   //CHECKBOX POLITICAS
   Widget crearCheck() => CheckboxListTile(
+      activeColor: Colors.amber,
       title: GestureDetector(
         child: Text(
           'Acepto las Políticas de Privacidad',
@@ -353,13 +356,13 @@ class _RegistrarState extends State<Registrar> {
                 Text(
                   selrubro == null ? '' : selrubro,
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.indigo,
+                    fontSize: 20,
+                    color: Colors.amber,
                     shadows: [
                       Shadow(
                         color: Colors.black,
-                        offset: Offset(1, 1),
-                        blurRadius: 8,
+                        offset: Offset(0, 0),
+                        blurRadius: 2,
                       ),
                     ],
                   ),
@@ -415,13 +418,13 @@ class _RegistrarState extends State<Registrar> {
                 Text(
                   selgim == null ? '' : selgim,
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.indigo,
+                    fontSize: 20,
+                    color: Colors.amber,
                     shadows: [
                       Shadow(
                         color: Colors.black,
-                        offset: Offset(1, 1),
-                        blurRadius: 8,
+                        offset: Offset(0, 0),
+                        blurRadius: 2,
                       ),
                     ],
                   ),
@@ -522,11 +525,20 @@ class _RegistrarState extends State<Registrar> {
                         barrierDismissible: false,
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: Text('Seleccione Rubro'),
+                          title: Text(
+                            'Rubros',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.blueGrey,
+                            ),
+                          ),
                           content: _crearCampoRubro(),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
+                                setState(() {
+                                  selrubro = rubrosselec;
+                                });
                                 Navigator.of(context).pop('Ok');
                               },
                               child: Text('Ok'),
@@ -536,6 +548,23 @@ class _RegistrarState extends State<Registrar> {
                       );
                     },
                     child: Text('Seleccione rubro'),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  selrubro == null ? '' : selrubro,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.amber,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        offset: Offset(0, 0),
+                        blurRadius: 3,
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
@@ -557,11 +586,20 @@ class _RegistrarState extends State<Registrar> {
                           barrierDismissible: false,
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text('Seleccione'),
+                            title: Text(
+                              rubrosselec,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.blueGrey,
+                              ),
+                            ),
                             content: _crearCampoGym(),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () {
+                                  setState(() {
+                                    selgim = gimselec;
+                                  });
                                   Navigator.of(context).pop('Ok');
                                 },
                                 child: Text('Ok'),
@@ -572,6 +610,23 @@ class _RegistrarState extends State<Registrar> {
                       }
                     },
                     child: Text('Seleccione una opcion'),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  selgim == null ? '' : selgim,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.amber,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        offset: Offset(0, 0),
+                        blurRadius: 3,
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(

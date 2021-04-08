@@ -315,6 +315,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
 
 //ESTE ES EL CHECKBOX COACH
   Widget crearCheck() => CheckboxListTile(
+      activeColor: Colors.amber,
       title: Text('Ingreso Admin'),
       value: value,
       onChanged: (value) {
