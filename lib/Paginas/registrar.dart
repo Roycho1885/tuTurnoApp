@@ -13,7 +13,7 @@ class Registrar extends StatefulWidget {
 
 class _RegistrarState extends State<Registrar> {
   bool poli = false;
-  bool lista = false;
+  bool cod = false;
   String _nombre;
   String _apellido;
   String _dni;
@@ -401,9 +401,26 @@ class _RegistrarState extends State<Registrar> {
                           }
                         }
                         _formkey.currentState.save();
-                        comprobarcodigo(rselec.nombre, _codigo, gselec.nombre);
-                        /*registrar(_nombre, _apellido, _dni, _direccion, _email,
-                            _contrasena, _gym, _codigo, context);*/
+                        comprobarcodigo(rselec.nombre, _codigo, gselec.nombre)
+                            .then((value) {
+                          if (value) {
+                            registrar(
+                                _nombre,
+                                _apellido,
+                                _dni,
+                                _direccion,
+                                _email,
+                                _contrasena,
+                                _rubronombre = gselec.nombre,
+                                _codigo,
+                                context,
+                                rselec.nombre);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content:
+                                    Text('El código ingresado no coincide')));
+                          }
+                        });
                       },
                     ),
                   ),
@@ -510,10 +527,10 @@ class _RegistrarState extends State<Registrar> {
 }
 
 //METODO REGISTRAR CLIENTE
-Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena, gym,
-    codigo, context) async {
-  final clienteNuevo = Cliente(nombre, apellido, dni, direccion, email, gym,
-      'No', 'Nada', 'Nada', 'Nada', 0);
+Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena,
+    rubronombre, codigo, context, rubselec) async {
+  final clienteNuevo = Cliente(nombre, apellido, dni, direccion, email,
+      rubronombre, 'No', 'Nada', 'Nada', 'Nada', 0);
 
   CollectionReference clinuevo =
       FirebaseFirestore.instance.collection('clientesPrincipal');
@@ -524,8 +541,10 @@ Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena, gym,
 
     validarcliente();
     return clinuevo
-        .doc('cli_gym')
-        .collection(gym)
+        .doc(rubselec)
+        .collection(rubronombre)
+        .doc('Clientes')
+        .collection('Clientes')
         .add(clienteNuevo.toJson())
         .then((value) => ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Cliente registrado con éxito'))));
@@ -539,9 +558,7 @@ Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena, gym,
             SnackBar(content: Text('Email utilizado en una cuenta existente')));
       }
     }
-  } catch (e) {
-    print(e);
-  }
+  } catch (e) {}
 }
 
 //ENVIO DE VALIDACION CLIENTE
@@ -553,10 +570,10 @@ Future<void> validarcliente() async {
 }
 
 //COMPRUEBO EL CODIGO DE ACCESO
-void comprobarcodigo(
-    String nombrerubro, String codigolocal, String nombrelocal) {
+Future<bool> comprobarcodigo(
+    String nombrerubro, String codigolocal, String nombrelocal) async {
   bool verdadero = false;
-  FirebaseFirestore.instance
+  await FirebaseFirestore.instance
       .collection('clientesList')
       .doc(nombrerubro)
       .collection(nombrerubro)
@@ -566,8 +583,7 @@ void comprobarcodigo(
       if (nombrelocal == doc['nombre'] && codigolocal == doc['codigoacceso']) {
         verdadero = true;
       }
-      print(verdadero);
-      return verdadero;
     });
   });
+  return verdadero;
 }
