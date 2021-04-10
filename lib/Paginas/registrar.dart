@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tuturnoapp/Modelo/Cliente.dart';
+import 'package:tuturnoapp/Modelo/Gimnasios.dart';
+import 'package:tuturnoapp/Modelo/rubros.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Registrar extends StatefulWidget {
@@ -19,17 +21,27 @@ class _RegistrarState extends State<Registrar> {
   String _email;
   String _contrasena;
   String _codigo;
-  String _gym;
-  String _rubro;
+  String _rubronombre;
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   bool _ocultar = true;
-  String rubrosselec, gimselec, selrubro, selgim;
+
+  //DROPDOWN
+  Rubros rselec;
+  Gimnasios gselec;
+  List<Rubros> rubrosfeos = [];
+  List<Gimnasios> gimfeos = [];
+  //--------------------------------
 
   @override
   void initState() {
     super.initState();
+    //OBTENGO LOS RUBROS PRIMERO PARA EL DROPDOWN RUBRO
+    obtenerrubros().then((List<Rubros> valor) {
+      setState(() {});
+      rubrosfeos = valor;
+    });
   }
 
   void _toogleboton() {
@@ -38,6 +50,7 @@ class _RegistrarState extends State<Registrar> {
     });
   }
 
+//CREACION DE LOS WIDGETS
   Widget _crearCampoNombre() {
     return TextFormField(
       keyboardType: TextInputType.text,
@@ -175,77 +188,7 @@ class _RegistrarState extends State<Registrar> {
     );
   }
 
-  Widget _crearCampoRubro() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('clientesList').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        List<DocumentSnapshot> docs = snapshot.data.docs;
-        return Container(
-          height: 200,
-          width: 100,
-          child: ListView.builder(
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              Map<String, dynamic> data = docs[index].data();
-              return ListTile(
-                leading: Icon(Icons.done_outline),
-                hoverColor: Colors.amberAccent,
-                title: Text(data['nombre']),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Ah seleccionado ' + data['nombre'])));
-                  rubrosselec = data['nombre'];
-                },
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _crearCampoGym() {
-    return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('clientesList')
-            .doc(rubrosselec)
-            .collection(rubrosselec)
-            .orderBy('nombre')
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          List<DocumentSnapshot> docs = snapshot.data.docs;
-          return Container(
-            height: 200,
-            width: 100,
-            child: ListView.builder(
-              itemCount: docs.length,
-              itemBuilder: (context, index) {
-                Map<String, dynamic> data = docs[index].data();
-                return ListTile(
-                  leading: Icon(Icons.done_outline),
-                  hoverColor: Colors.amberAccent,
-                  title: Text(data['nombre']),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Ah seleccionado ' + data['nombre'])));
-                    gimselec = data['nombre'];
-                  },
-                );
-              },
-            ),
-          );
-        });
-  }
+  //----------------------------------------------------------------------
 
   //CHECKBOX POLITICAS
   Widget crearCheck() => CheckboxListTile(
@@ -265,7 +208,9 @@ class _RegistrarState extends State<Registrar> {
           this.poli = value;
         });
       });
+  //-------------------------------------------------------------------
 
+//ACA SE MUESTRAN LOS WIDGETS
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
@@ -278,200 +223,196 @@ class _RegistrarState extends State<Registrar> {
       ),
     );
   }
+  //----------------------------------------------
+
+  Widget _multiplesdropdown() {
+    return Container(
+      width: 600,
+      height: 200,
+      child: ListView(
+        padding: EdgeInsets.all(20),
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: 10, right: 10),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+              border: Border.all(color: Colors.amber, width: 2),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<Rubros>(
+                dropdownColor: Colors.amber[200],
+                hint: Text('Seleccione Rubro'),
+                value: rselec,
+                isExpanded: true,
+                items: rubrosfeos.map((Rubros rub) {
+                  return DropdownMenuItem<Rubros>(
+                    value: rub,
+                    child: Text(rub.nombre),
+                  );
+                }).toList(),
+                onChanged: onRubroCambio,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 40,
+          ),
+          Container(
+            padding: EdgeInsets.only(left: 10, right: 10),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+              border: Border.all(color: Colors.amber, width: 2),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<Gimnasios>(
+                hint: Text('Seleccione primero un Rubro'),
+                value: gselec,
+                isExpanded: true,
+                dropdownColor: Colors.amber[200],
+                items: gimfeos.map((Gimnasios gim) {
+                  return DropdownMenuItem<Gimnasios>(
+                    value: gim,
+                    child: Text(gim.nombre),
+                  );
+                }).toList(),
+                onChanged: onGimCambio,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+//LOS ONCHANGE PARA LOS DROPDOWNS Y LAS FUNCIONES PARA LISTARLOS DESDE LA DB
+  void onRubroCambio(rub) {
+    setState(() {
+      rselec = rub;
+      gimfeos = [];
+      gselec = null;
+    });
+    obtenergim(rselec.nombre).then((List<Gimnasios> valor) {
+      setState(() {});
+      gimfeos = valor;
+    });
+  }
+
+  void onGimCambio(gim) {
+    setState(() {
+      gselec = gim;
+    });
+  }
+
+  Future<List<Rubros>> obtenerrubros() async {
+    List rubrosmalditos = [];
+    await FirebaseFirestore.instance
+        .collection('clientesList')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        rubrosmalditos.add(doc.data());
+      });
+    });
+    return rubrosmalditos.map((e) => Rubros.fromMap(e)).toList();
+  }
+
+  Future<List<Gimnasios>> obtenergim(String elrubroselec) async {
+    List gimmalditos = [];
+    await FirebaseFirestore.instance
+        .collection('clientesList')
+        .doc(elrubroselec)
+        .collection(elrubroselec)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        gimmalditos.add(doc.data());
+      });
+    });
+    return gimmalditos.map((e) => Gimnasios.fromMap(e)).toList();
+  }
+  //-----------------------------------------------------------------
 
   Widget _pantallaGrande() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(200, 5, 200, 5),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formkey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _crearCampoNombre(),
-                SizedBox(
-                  height: 40,
-                ),
-                _crearCampoApellido(),
-                SizedBox(
-                  height: 40,
-                ),
-                _crearCampoDni(),
-                SizedBox(
-                  height: 40,
-                ),
-                _crearCampoDireccion(),
-                SizedBox(
-                  height: 40,
-                ),
-                _crearCampoEmail(),
-                SizedBox(
-                  height: 40,
-                ),
-                _crearCampoContrasena(),
-                SizedBox(
-                  height: 40,
-                ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(
-                            'Rubros',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                            ),
-                          ),
-                          content: _crearCampoRubro(),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  selrubro = rubrosselec;
-                                });
-                                Navigator.of(context).pop('Ok');
-                              },
-                              child: Text('Ok'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    child: Text('Seleccione rubro'),
+    return Scrollbar(
+      child: Container(
+        padding: EdgeInsets.fromLTRB(200, 5, 200, 5),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formkey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _crearCampoNombre(),
+                  SizedBox(
+                    height: 40,
                   ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  selrubro == null ? '' : selrubro,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.amber,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black,
-                        offset: Offset(0, 0),
-                        blurRadius: 2,
+                  _crearCampoApellido(),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _crearCampoDni(),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _crearCampoDireccion(),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _crearCampoEmail(),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _crearCampoContrasena(),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _multiplesdropdown(),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _crearCampoCodigo(),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Container(
+                    width: 260,
+                    height: 50,
+                    child: ElevatedButton(
+                      child: Text('Registrar'),
+                      style: OutlinedButton.styleFrom(
+                        shape: StadiumBorder(),
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      if (rubrosselec == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Primero seleccione un rubro')));
-                      } else {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(
-                              rubrosselec,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.blueGrey,
-                              ),
-                            ),
-                            content: _crearCampoGym(),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    selgim = gimselec;
-                                  });
-                                  Navigator.of(context).pop('Ok');
-                                },
-                                child: Text('Ok'),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                    },
-                    child: Text('Seleccione una opcion'),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  selgim == null ? '' : selgim,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.amber,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black,
-                        offset: Offset(0, 0),
-                        blurRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                _crearCampoCodigo(),
-                SizedBox(
-                  height: 40,
-                ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    child: Text('Registrar'),
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      if (!_formkey.currentState.validate()) {
-                        return;
-                      } else {
-                        if (_gym == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Seleccione un gimnasio')));
+                      onPressed: () {
+                        if (!_formkey.currentState.validate()) {
                           return;
                         } else {
-                          if (!poli) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text(
-                                    'Debe aceptar las Políticas de Privacidad')));
+                          if (rselec == null || gselec == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Seleccione opciones')));
                             return;
+                          } else {
+                            if (!poli) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      'Debe aceptar las Políticas de Privacidad')));
+                              return;
+                            }
                           }
                         }
-                      }
-                      _formkey.currentState.save();
-                      registrar(_nombre, _apellido, _dni, _direccion, _email,
-                          _contrasena, _gym, _codigo, context);
-                    },
+                        _formkey.currentState.save();
+                        comprobarcodigo(rselec.nombre, _codigo, gselec.nombre);
+                        /*registrar(_nombre, _apellido, _dni, _direccion, _email,
+                            _contrasena, _gym, _codigo, context);*/
+                      },
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                crearCheck(),
-              ],
+                  SizedBox(
+                    height: 20,
+                  ),
+                  crearCheck(),
+                ],
+              ),
             ),
           ),
         ),
@@ -480,199 +421,86 @@ class _RegistrarState extends State<Registrar> {
   }
 
   Widget _pantallaChica() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formkey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _crearCampoNombre(),
-                SizedBox(
-                  height: 30,
-                ),
-                _crearCampoApellido(),
-                SizedBox(
-                  height: 30,
-                ),
-                _crearCampoDni(),
-                SizedBox(
-                  height: 30,
-                ),
-                _crearCampoDireccion(),
-                SizedBox(
-                  height: 30,
-                ),
-                _crearCampoEmail(),
-                SizedBox(
-                  height: 30,
-                ),
-                _crearCampoContrasena(),
-                SizedBox(
-                  height: 30,
-                ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(
-                            'Rubros',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.blueGrey,
-                            ),
-                          ),
-                          content: _crearCampoRubro(),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  selrubro = rubrosselec;
-                                });
-                                Navigator.of(context).pop('Ok');
-                              },
-                              child: Text('Ok'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    child: Text('Seleccione rubro'),
+    return Scrollbar(
+      child: Container(
+        padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formkey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _crearCampoNombre(),
+                  SizedBox(
+                    height: 30,
                   ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  selrubro == null ? '' : selrubro,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.amber,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black,
-                        offset: Offset(0, 0),
-                        blurRadius: 3,
+                  _crearCampoApellido(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _crearCampoDni(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _crearCampoDireccion(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _crearCampoEmail(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _crearCampoContrasena(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _multiplesdropdown(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _crearCampoCodigo(),
+                  SizedBox(
+                    height: 50,
+                  ),
+                  Container(
+                    width: 260,
+                    height: 50,
+                    child: ElevatedButton(
+                      child: Text('Registrar'),
+                      style: OutlinedButton.styleFrom(
+                        shape: StadiumBorder(),
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      if (rubrosselec == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Primero seleccione un rubro')));
-                      } else {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(
-                              rubrosselec,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.blueGrey,
-                              ),
-                            ),
-                            content: _crearCampoGym(),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    selgim = gimselec;
-                                  });
-                                  Navigator.of(context).pop('Ok');
-                                },
-                                child: Text('Ok'),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                    },
-                    child: Text('Seleccione una opcion'),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  selgim == null ? '' : selgim,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.amber,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black,
-                        offset: Offset(0, 0),
-                        blurRadius: 3,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                _crearCampoCodigo(),
-                SizedBox(
-                  height: 50,
-                ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    child: Text('Registrar'),
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      if (!_formkey.currentState.validate()) {
-                        return;
-                      } else {
-                        if (_gym == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Seleccione un gimnasio')));
+                      onPressed: () {
+                        if (!_formkey.currentState.validate()) {
                           return;
                         } else {
-                          if (!poli) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text(
-                                    'Debe aceptar las Políticas de Privacidad')));
+                          if (rselec == null || gselec == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Seleccione opciones')));
                             return;
+                          } else {
+                            if (!poli) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      'Debe aceptar las Políticas de Privacidad')));
+                              return;
+                            }
                           }
                         }
-                      }
-                      _formkey.currentState.save();
-                      comprobarcodigo(_gym, _codigo);
-                      /*registrar(_nombre, _apellido, _dni, _direccion, _email,
-                          _contrasena, _gym, _codigo, context);*/
-                    },
+                        _formkey.currentState.save();
+                        //comprobarcodigo(gselec.nombre, _codigo);
+                        /*registrar(_nombre, _apellido, _dni, _direccion, _email,
+                            _contrasena, _gym, _codigo, context);*/
+                      },
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                crearCheck(),
-              ],
+                  SizedBox(
+                    height: 20,
+                  ),
+                  crearCheck(),
+                ],
+              ),
             ),
           ),
         ),
@@ -725,12 +553,13 @@ Future<void> validarcliente() async {
 }
 
 //COMPRUEBO EL CODIGO DE ACCESO
-void comprobarcodigo(String nombrelocal, String codigolocal) {
+void comprobarcodigo(
+    String nombrerubro, String codigolocal, String nombrelocal) {
   bool verdadero = false;
   FirebaseFirestore.instance
       .collection('clientesList')
-      .doc('rubros')
-      .collection('gimnasios')
+      .doc(nombrerubro)
+      .collection(nombrerubro)
       .get()
       .then((QuerySnapshot query) {
     query.docs.forEach((doc) {

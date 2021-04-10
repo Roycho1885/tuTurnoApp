@@ -4,7 +4,7 @@ class Cliente {
   String _dni;
   String _direccion;
   String _email;
-  String _gym;
+  String _rubronombre;
   String _admin;
   String _token;
   String _ultimopago;
@@ -17,7 +17,7 @@ class Cliente {
       this._dni,
       this._direccion,
       this._email,
-      this._gym,
+      this._rubronombre,
       this._admin,
       this._token,
       this._ultimopago,
@@ -35,7 +35,7 @@ class Cliente {
         'dni': dni,
         'direccion': direccion,
         'email': email,
-        'gym': gym,
+        'rubronombre': rubronombre,
         'admin': admin,
         'token': token,
         'ultimopago': ultimopago,
@@ -63,8 +63,8 @@ class Cliente {
     this._email = email;
   }
 
-  set gym(String gym) {
-    this._gym = gym;
+  set gym(String rubronombre) {
+    this._rubronombre = rubronombre;
   }
 
   set admin(String admin) {
@@ -92,7 +92,7 @@ class Cliente {
   String get dni => this._dni;
   String get direccion => this._direccion;
   String get email => this._email;
-  String get gym => this._gym;
+  String get rubronombre => this._rubronombre;
   String get admin => this._admin;
   String get token => this._token;
   String get ultimopago => this._ultimopago;
