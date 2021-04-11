@@ -18,7 +18,8 @@ class ProgressDialog extends StatelessWidget {
                 width: 6.0,
               ),
               CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(Colors.amber.shade700),
               ),
               SizedBox(
                 width: 26.0,

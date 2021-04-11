@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class PrincipalUsuario extends StatefulWidget {
@@ -6,10 +7,33 @@ class PrincipalUsuario extends StatefulWidget {
 }
 
 class _PrincipalUsuarioState extends State<PrincipalUsuario> {
+  String useremail;
+  @override
+  void initState() {
+    super.initState();
+    //OBTENGO LOS RUBROS PRIMERO PARA EL DROPDOWN RUBRO
+    FirebaseAuth auth = FirebaseAuth.instance;
+    if (auth != null) {
+      useremail = auth.currentUser.email;
+    }
+  }
+
   Widget _pantallaGrande() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pantalla Usuario'),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(
+                Icons.logout,
+              ),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/');
+              }),
+        ],
+        title: Text('Bienvenido ' + useremail),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -69,13 +93,36 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        foregroundColor: Colors.black,
+        splashColor: Colors.blueGrey,
+        highlightElevation: 20.0,
+        tooltip: 'Reservar Turno',
+        label: const Text('Reservar'),
+        onPressed: () {},
+        icon: const Icon(Icons.add),
+        backgroundColor: Colors.amber.shade700,
+      ),
     );
   }
 
   Widget _pantallaChica() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pantalla Usuario'),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(
+                Icons.logout,
+              ),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/');
+              }),
+        ],
+        leadingWidth: 25,
+        title: Text('Bienvenido ' + useremail),
       ),
       drawer: new Drawer(
         child: ListView(padding: EdgeInsets.zero, children: <Widget>[
@@ -113,6 +160,14 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
           PersonalListTile(Icons.phone_android, "Acerca de", () => {})
         ]),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        tooltip: 'Reservar Turno',
+        splashColor: Colors.blueGrey,
+        highlightElevation: 20.0,
+        backgroundColor: Colors.amber.shade700,
+        child: Icon(Icons.add),
+      ),
     );
   }
 
@@ -144,7 +199,7 @@ class PersonalListTile extends StatelessWidget {
         decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: Colors.grey.shade400))),
         child: InkWell(
-          splashColor: Colors.indigoAccent,
+          splashColor: Colors.blueGrey,
           onTap: onTap,
           child: Container(
             height: 50,

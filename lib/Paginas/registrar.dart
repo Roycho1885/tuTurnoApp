@@ -192,7 +192,7 @@ class _RegistrarState extends State<Registrar> {
 
   //CHECKBOX POLITICAS
   Widget crearCheck() => CheckboxListTile(
-      activeColor: Colors.amber,
+      activeColor: Colors.amber.shade700,
       title: GestureDetector(
         child: Text(
           'Acepto las Políticas de Privacidad',
@@ -236,7 +236,7 @@ class _RegistrarState extends State<Registrar> {
             padding: EdgeInsets.only(left: 10, right: 10),
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-              border: Border.all(color: Colors.amber, width: 2),
+              border: Border.all(color: Colors.amber.shade700, width: 2),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Rubros>(
@@ -261,7 +261,7 @@ class _RegistrarState extends State<Registrar> {
             padding: EdgeInsets.only(left: 10, right: 10),
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-              border: Border.all(color: Colors.amber, width: 2),
+              border: Border.all(color: Colors.amber.shade700, width: 2),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Gimnasios>(
@@ -506,9 +506,26 @@ class _RegistrarState extends State<Registrar> {
                           }
                         }
                         _formkey.currentState.save();
-                        //comprobarcodigo(gselec.nombre, _codigo);
-                        /*registrar(_nombre, _apellido, _dni, _direccion, _email,
-                            _contrasena, _gym, _codigo, context);*/
+                        comprobarcodigo(rselec.nombre, _codigo, gselec.nombre)
+                            .then((value) {
+                          if (value) {
+                            registrar(
+                                _nombre,
+                                _apellido,
+                                _dni,
+                                _direccion,
+                                _email,
+                                _contrasena,
+                                _rubronombre = gselec.nombre,
+                                _codigo,
+                                context,
+                                rselec.nombre);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content:
+                                    Text('El código ingresado no coincide')));
+                          }
+                        });
                       },
                     ),
                   ),
@@ -540,6 +557,7 @@ Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena,
         .createUserWithEmailAndPassword(email: email, password: contrasena);
 
     validarcliente();
+    Navigator.of(context).pushNamed('/');
     return clinuevo
         .doc(rubselec)
         .collection(rubronombre)

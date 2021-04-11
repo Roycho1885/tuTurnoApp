@@ -5,8 +5,14 @@ import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'Paginas/user_principal.dart';
 import 'Widgets/progressDialog.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+        statusBarColor: Colors.indigoAccent,
+        statusBarBrightness: Brightness.dark),
+  );
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(App());
