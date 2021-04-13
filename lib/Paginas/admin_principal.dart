@@ -1,13 +1,13 @@
-import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tuturnoapp/Paginas/user_principal.dart';
 
-class PrincipalUsuario extends StatefulWidget {
+class PrincipalAdmin extends StatefulWidget {
   @override
-  _PrincipalUsuarioState createState() => _PrincipalUsuarioState();
+  _PrincipalAdminState createState() => _PrincipalAdminState();
 }
 
-class _PrincipalUsuarioState extends State<PrincipalUsuario> {
+class _PrincipalAdminState extends State<PrincipalAdmin> {
   String useremail;
   @override
   void initState() {
@@ -72,7 +72,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home USUARIO',
+            label: 'Home ADMIN',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
@@ -214,7 +214,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
               ),
             ),
           ),
-          PersonalListTile(Icons.home, "Home USUARIO", () => {}),
+          PersonalListTile(Icons.home, "Home ADMIN", () => {}),
           PersonalListTile(Icons.list, "Mi turno", () => {}),
           PersonalListTile(Icons.settings, "Configuración", () => {}),
           PersonalListTile(Icons.email, "Contacto", () => {}),
@@ -244,50 +244,5 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
     } else {
       return _pantallaChica();
     }
-  }
-}
-
-// ignore: must_be_immutable
-class PersonalListTile extends StatelessWidget {
-  IconData icon;
-  String text;
-  Function onTap;
-
-  PersonalListTile(this.icon, this.text, this.onTap);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-      child: Container(
-        decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.grey.shade400))),
-        child: InkWell(
-          splashColor: Colors.blueGrey,
-          onTap: onTap,
-          child: Container(
-            height: 50,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: [
-                    Icon(icon),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        text,
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                    ),
-                  ],
-                ),
-                Icon(Icons.arrow_right)
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

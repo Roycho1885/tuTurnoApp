@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'Paginas/user_principal.dart';
@@ -28,6 +30,7 @@ class App extends StatelessWidget {
       routes: {
         '/': (context) => PantallaInicial(),
         '/prinUsuario': (context) => PrincipalUsuario(),
+        '/prinAdmin': (context) => PrincipalAdmin(),
         '/registro': (context) => Registrar(),
         '/olvicontra': (context) => OlvidePass(),
       },
@@ -338,8 +341,13 @@ class _PantallaInicialState extends State<PantallaInicial> {
               password: _controlContra.text.trim()))
           .user;
 
-      Navigator.pop(context);
-      Navigator.of(context).pushNamed('/prinUsuario');
+      obtenerclientes(user).then((value) {
+        if (value == 'Si') {
+          Navigator.of(context).pushNamed('/prinAdmin');
+        } else {
+          Navigator.of(context).pushNamed('/prinUsuario');
+        }
+      });
 
       _formkey.currentState.reset();
     } on FirebaseAuthException catch (e) {
@@ -359,5 +367,23 @@ class _PantallaInicialState extends State<PantallaInicial> {
         }
       }
     }
+  }
+
+  Future<String> obtenerclientes(User user) async {
+    String admin;
+    await FirebaseFirestore.instance
+        .collection('clientesPrincipal')
+        .doc('Clientes')
+        .collection('Clientes')
+        .get()
+        .then((QuerySnapshot query) {
+      query.docs.forEach((doc) {
+        if (user.email == doc['email']) {
+          admin = doc['admin'];
+        }
+      });
+    });
+    Navigator.pop(context);
+    return admin;
   }
 }

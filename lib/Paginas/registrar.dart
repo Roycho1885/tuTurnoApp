@@ -556,11 +556,9 @@ Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena,
     UserCredential userCreden = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: contrasena);
 
-    validarcliente();
+    validarcliente(context);
     Navigator.of(context).pushNamed('/');
     return clinuevo
-        .doc(rubselec)
-        .collection(rubronombre)
         .doc('Clientes')
         .collection('Clientes')
         .add(clienteNuevo.toJson())
@@ -580,10 +578,12 @@ Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena,
 }
 
 //ENVIO DE VALIDACION CLIENTE
-Future<void> validarcliente() async {
+Future<void> validarcliente(context) async {
   User clienteEmail = FirebaseAuth.instance.currentUser;
   if (!clienteEmail.emailVerified) {
     await clienteEmail.sendEmailVerification();
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Email enviado con éxito')));
   }
 }
 
