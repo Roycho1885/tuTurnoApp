@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-        statusBarColor: Colors.indigoAccent,
+        statusBarColor: Colors.indigo.shade300,
         statusBarBrightness: Brightness.dark),
   );
   WidgetsFlutterBinding.ensureInitialized();

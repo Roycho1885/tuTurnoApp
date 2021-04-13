@@ -1,3 +1,6 @@
+import 'dart:html';
+import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -18,11 +21,44 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
     }
   }
 
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const List<Widget> _widgetOptions = <Widget>[
+    Text(
+      'Index 0: Home',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 1: Mi turno',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 2: Config',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 3: Contacto',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 4: Acerca de',
+      style: optionStyle,
+    ),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   Widget _pantallaGrande() {
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
           IconButton(
+              tooltip: 'Cerrar Sesión',
               icon: Icon(
                 Icons.logout,
               ),
@@ -35,61 +71,88 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
         ],
         title: Text('Bienvenido ' + useremail),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Container(
-                width: 250,
-                height: 250,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: <Color>[
-                      Colors.black,
-                      Colors.indigo,
-                      Colors.indigoAccent
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Mi Turno',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Configuración',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.email),
+            label: 'Contacto',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.phone_android),
+            label: 'Acerca de',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        elevation: 25,
+        unselectedIconTheme: IconThemeData.lerp(
+            IconThemeData(color: Colors.white),
+            IconThemeData(color: Colors.indigoAccent.shade100),
+            105.2),
+        selectedItemColor: Colors.amber,
+        iconSize: 30,
+        onTap: _onItemTapped,
+      ),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: <Color>[
+                        Colors.black,
+                        Colors.indigo,
+                        Colors.indigoAccent
+                      ],
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
+                        child: Image.asset(
+                          'assets/images/logogris.png',
+                          width: 110,
+                          height: 110,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          'tu Turno App',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
-                      child: Image.asset(
-                        'assets/images/logogris.png',
-                        width: 140,
-                        height: 140,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                      child: Text('tu Turno App',
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 16.0)),
-                    ),
-                  ],
                 ),
               ),
             ],
           ),
-          Row(
-            children: <Widget>[
-              Container(
-                width: 250,
-                height: 300,
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: <Widget>[
-                    PersonalListTile(Icons.home, "Home", () => {}),
-                    PersonalListTile(Icons.list, "Mi turno", () => {}),
-                    PersonalListTile(Icons.settings, "Configuración", () => {}),
-                    PersonalListTile(Icons.email, "Contacto", () => {}),
-                    PersonalListTile(Icons.phone_android, "Acerca de", () => {})
-                  ],
-                ),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              children: [
+                _widgetOptions.elementAt(_selectedIndex),
+              ],
+            ),
           ),
         ],
       ),
@@ -111,6 +174,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
       appBar: AppBar(
         actions: <Widget>[
           IconButton(
+              tooltip: 'Cerrar Sesión',
               icon: Icon(
                 Icons.logout,
               ),
@@ -159,6 +223,9 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
           PersonalListTile(Icons.email, "Contacto", () => {}),
           PersonalListTile(Icons.phone_android, "Acerca de", () => {})
         ]),
+      ),
+      body: Center(
+        child: Text('dadadddad'),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
