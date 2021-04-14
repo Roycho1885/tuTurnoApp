@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,11 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
     if (auth != null) {
       useremail = auth.currentUser.email;
     }
+    obtenerclientes(auth.currentUser).then((value) {
+      if (value == 'Si') {
+        Navigator.of(context).pushNamed('/');
+      }
+    });
   }
 
   int _selectedIndex = 0;
@@ -94,9 +100,9 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
         currentIndex: _selectedIndex,
         elevation: 25,
         unselectedIconTheme: IconThemeData.lerp(
-            IconThemeData(color: Colors.white),
-            IconThemeData(color: Colors.indigoAccent.shade100),
-            105.2),
+            IconThemeData(color: Colors.amberAccent),
+            IconThemeData(color: Colors.blue.shade800),
+            20),
         selectedItemColor: Colors.amber,
         iconSize: 30,
         onTap: _onItemTapped,
@@ -222,7 +228,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
         ]),
       ),
       body: Center(
-        child: Text('dadadddad'),
+        child: Text('Hola usuario'),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
@@ -245,6 +251,23 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
       return _pantallaChica();
     }
   }
+}
+
+Future<String> obtenerclientes(User user) async {
+  String admin;
+  await FirebaseFirestore.instance
+      .collection('clientesPrincipal')
+      .doc('Clientes')
+      .collection('Clientes')
+      .get()
+      .then((QuerySnapshot query) {
+    query.docs.forEach((doc) {
+      if (user.email == doc['email']) {
+        admin = doc['admin'];
+      }
+    });
+  });
+  return admin;
 }
 
 // ignore: must_be_immutable

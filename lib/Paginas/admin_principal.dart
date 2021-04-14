@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tuturnoapp/Paginas/user_principal.dart';
@@ -16,6 +17,11 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
     if (auth != null) {
       useremail = auth.currentUser.email;
     }
+    obtenerclientes(auth.currentUser).then((value) {
+      if (value == 'No') {
+        Navigator.of(context).pushNamed('/');
+      }
+    });
   }
 
   int _selectedIndex = 0;
@@ -244,5 +250,22 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
     } else {
       return _pantallaChica();
     }
+  }
+
+  Future<String> obtenerclientes(User user) async {
+    String admin;
+    await FirebaseFirestore.instance
+        .collection('clientesPrincipal')
+        .doc('Clientes')
+        .collection('Clientes')
+        .get()
+        .then((QuerySnapshot query) {
+      query.docs.forEach((doc) {
+        if (user.email == doc['email']) {
+          admin = doc['admin'];
+        }
+      });
+    });
+    return admin;
   }
 }

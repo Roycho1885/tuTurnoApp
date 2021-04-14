@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:splashscreen/splashscreen.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
@@ -44,6 +45,25 @@ class PantallaInicial extends StatefulWidget {
 }
 
 class _PantallaInicialState extends State<PantallaInicial> {
+  @override
+  Widget build(BuildContext context) {
+    return new SplashScreen(
+      seconds: 3,
+      navigateAfterSeconds: DespuesDeSplash(),
+      image: Image.asset('assets/images/logo.png'),
+      photoSize: 80,
+      loaderColor: Colors.amber.shade400,
+      loadingText: Text('Cargando...'),
+    );
+  }
+}
+
+class DespuesDeSplash extends StatefulWidget {
+  @override
+  _DespuesDeSplashState createState() => _DespuesDeSplashState();
+}
+
+class _DespuesDeSplashState extends State<DespuesDeSplash> {
   TextEditingController _controlUsuario;
   TextEditingController _controlContra;
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -119,9 +139,8 @@ class _PantallaInicialState extends State<PantallaInicial> {
                   ),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(50, 10, 50, 20),
-                child: crearCheck(),
+              SizedBox(
+                height: 20,
               ),
               Container(
                 width: 260,
@@ -240,9 +259,8 @@ class _PantallaInicialState extends State<PantallaInicial> {
                     ),
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(50, 10, 50, 20),
-                  child: crearCheck(),
+                SizedBox(
+                  height: 20,
                 ),
                 Container(
                   width: 260,
@@ -308,31 +326,6 @@ class _PantallaInicialState extends State<PantallaInicial> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('tu Turno'),
-      ),
-      body: Center(
-        child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
-      ),
-    );
-  }
-
-//ESTE ES EL CHECKBOX COACH
-  Widget crearCheck() => CheckboxListTile(
-      activeColor: Colors.amber,
-      title: Text('Ingreso Admin'),
-      value: value,
-      onChanged: (value) {
-        setState(() {
-          this.value = value;
-        });
-      });
-
   //FUNCION LOGIN
   void login() async {
     try {
@@ -351,7 +344,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
 
       _formkey.currentState.reset();
     } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
+      //Navigator.pop(context);
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('El email ingresado no se encuentra registrado')));
@@ -364,11 +357,13 @@ class _PantallaInicialState extends State<PantallaInicial> {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('Verifique que el email no contenga espacios')));
           }
+          print(e.code);
         }
       }
     }
   }
 
+//OBTENGO CLIENTES PARA SABER SI SON ADMINES
   Future<String> obtenerclientes(User user) async {
     String admin;
     await FirebaseFirestore.instance
@@ -383,7 +378,19 @@ class _PantallaInicialState extends State<PantallaInicial> {
         }
       });
     });
-    Navigator.pop(context);
     return admin;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('tu Turno'),
+      ),
+      body: Center(
+        child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
+      ),
+    );
   }
 }
