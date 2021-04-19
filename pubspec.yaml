@@ -30,6 +30,7 @@ flutter:
   assets:
       - assets/images/logo.png
       - assets/images/logogris.png
+      - assets/images/tuturnoicon.png
   fonts:
     - family: Rubik
       fonts:

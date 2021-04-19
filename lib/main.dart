@@ -7,7 +7,6 @@ import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'Paginas/user_principal.dart';
-import 'Widgets/progressDialog.dart';
 import 'package:flutter/services.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
