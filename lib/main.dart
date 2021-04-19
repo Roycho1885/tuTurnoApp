@@ -9,6 +9,7 @@ import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'Paginas/user_principal.dart';
 import 'Widgets/progressDialog.dart';
 import 'package:flutter/services.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
@@ -67,6 +68,18 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
   TextEditingController _controlUsuario;
   TextEditingController _controlContra;
   FirebaseAuth _auth = FirebaseAuth.instance;
+
+  _normalProgress(context) async {
+    ProgressDialog pr = ProgressDialog(context: context);
+    pr.show(
+      max: 100,
+      msg: 'Accediendo\nEspera por favor...',
+      progressBgColor: Colors.amber,
+    );
+    await Future.delayed(Duration(seconds: 2));
+    _formkey.currentState.reset();
+    pr.close();
+  }
 
   final _formkey = GlobalKey<FormState>();
 
@@ -152,14 +165,15 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
                   onPressed: () {
                     //ACA SE INICIA SESION AL USUARIO
                     if (_formkey.currentState.validate()) {
-                      showDialog(
+                      //_normalProgress(context);
+                      /*showDialog(
                           context: context,
                           barrierDismissible: false,
                           builder: (BuildContext context) {
                             return ProgressDialog(
                               mensaje: 'Accediendo\nEspera por favor...',
                             );
-                          });
+                          });*/
                       login();
                     }
                   },
@@ -272,14 +286,14 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
                     onPressed: () {
                       //ACA SE INICIA SESION AL USUARIO
                       if (_formkey.currentState.validate()) {
-                        showDialog(
+                        /*showDialog(
                             context: context,
                             barrierDismissible: false,
                             builder: (BuildContext context) {
                               return ProgressDialog(
                                 mensaje: 'Accediendo\nEspera por favor...',
                               );
-                            });
+                            });*/
                         login();
                       }
                     },
@@ -329,11 +343,11 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
   //FUNCION LOGIN
   void login() async {
     try {
+      _normalProgress(context);
       final User user = (await _auth.signInWithEmailAndPassword(
               email: _controlUsuario.text.trim(),
               password: _controlContra.text.trim()))
           .user;
-
       obtenerclientes(user).then((value) {
         if (value == 'Si') {
           Navigator.of(context).pushNamed('/prinAdmin');
@@ -341,10 +355,8 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
           Navigator.of(context).pushNamed('/prinUsuario');
         }
       });
-
-      _formkey.currentState.reset();
+      // _formkey.currentState.reset();
     } on FirebaseAuthException catch (e) {
-      //Navigator.pop(context);
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('El email ingresado no se encuentra registrado')));
@@ -357,7 +369,6 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('Verifique que el email no contenga espacios')));
           }
-          print(e.code);
         }
       }
     }

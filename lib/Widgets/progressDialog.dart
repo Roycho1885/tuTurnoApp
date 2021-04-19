@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ProgressDialog extends StatelessWidget {
+/*class ProgressDialog extends StatelessWidget {
   String mensaje;
   ProgressDialog({this.mensaje});
   @override
@@ -34,4 +34,4 @@ class ProgressDialog extends StatelessWidget {
       ),
     );
   }
-}
+}*/
