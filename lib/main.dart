@@ -6,9 +6,9 @@ import 'package:splashscreen/splashscreen.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
+import 'package:tuturnoapp/Widgets/progressDialog.dart';
 import 'Paginas/user_principal.dart';
 import 'package:flutter/services.dart';
-import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
@@ -68,18 +68,6 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
   TextEditingController _controlContra;
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  _normalProgress(context) async {
-    ProgressDialog pr = ProgressDialog(context: context);
-    pr.show(
-      max: 100,
-      msg: 'Accediendo\nEspera por favor...',
-      progressBgColor: Colors.amber,
-    );
-    await Future.delayed(Duration(seconds: 2));
-    _formkey.currentState.reset();
-    pr.close();
-  }
-
   final _formkey = GlobalKey<FormState>();
 
   bool _ocultar = true;
@@ -90,6 +78,26 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
       _ocultar = !_ocultar;
     });
   }
+
+  /*showAlertDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: new Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(
+            margin: EdgeInsets.only(left: 5),
+            child: Text('Cargando...'),
+          ),
+        ],
+      ),
+    );
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        });
+  }*/
 
   @override
   void initState() {
@@ -164,15 +172,14 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
                   onPressed: () {
                     //ACA SE INICIA SESION AL USUARIO
                     if (_formkey.currentState.validate()) {
-                      //_normalProgress(context);
-                      /*showDialog(
+                      showDialog(
                           context: context,
                           barrierDismissible: false,
                           builder: (BuildContext context) {
                             return ProgressDialog(
-                              mensaje: 'Accediendo\nEspera por favor...',
+                              mensaje: 'Accediendo...',
                             );
-                          });*/
+                          });
                       login();
                     }
                   },
@@ -285,14 +292,14 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
                     onPressed: () {
                       //ACA SE INICIA SESION AL USUARIO
                       if (_formkey.currentState.validate()) {
-                        /*showDialog(
+                        showDialog(
                             context: context,
                             barrierDismissible: false,
                             builder: (BuildContext context) {
                               return ProgressDialog(
-                                mensaje: 'Accediendo\nEspera por favor...',
+                                mensaje: 'Accediendo...',
                               );
-                            });*/
+                            });
                         login();
                       }
                     },
@@ -342,7 +349,6 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
   //FUNCION LOGIN
   void login() async {
     try {
-      _normalProgress(context);
       final User user = (await _auth.signInWithEmailAndPassword(
               email: _controlUsuario.text.trim(),
               password: _controlContra.text.trim()))
@@ -354,19 +360,23 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
           Navigator.of(context).pushNamed('/prinUsuario');
         }
       });
-      // _formkey.currentState.reset();
+      _formkey.currentState.reset();
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('El email ingresado no se encuentra registrado')));
+        Navigator.pop(context);
       } else {
         if (e.code == 'wrong-password') {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('La contraseña ingresada es incorrecta')));
+          Navigator.pop(context);
         } else {
           if (e.code == 'invalid-email') {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('Verifique que el email no contenga espacios')));
+            Navigator.pop(context);
           }
         }
       }
