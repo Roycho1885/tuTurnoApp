@@ -9,6 +9,7 @@ import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'package:tuturnoapp/Widgets/progressDialog.dart';
 import 'Paginas/user_principal.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
@@ -25,6 +26,14 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('es'),
+      ],
+      locale: const Locale('es'),
       debugShowCheckedModeBanner: false,
       title: 'tuTurno',
       theme: ThemeData(primarySwatch: Colors.indigo, fontFamily: 'Rubik'),

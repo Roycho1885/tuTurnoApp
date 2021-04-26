@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class PrincipalUsuario extends StatefulWidget {
   @override
@@ -24,31 +25,84 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
     });
   }
 
+  //INPUT DE FECHA
+  DateTime _date = DateTime.now();
+  String _fecha;
+
+  Future<Null> _selecFecha(BuildContext context) async {
+    DateTime _datePicker = await showDatePicker(
+      context: context,
+      initialDate: _date.weekday == 7
+          ? DateTime(
+              DateTime.now().year, DateTime.now().month, DateTime.now().day + 1)
+          : _date,
+      //initialDatePickerMode: DatePickerMode.day,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      selectableDayPredicate: (DateTime val) => val.weekday == 7 ? false : true,
+    );
+
+    if (_datePicker != null && _datePicker != _date) {
+      setState(() {
+        _date = _datePicker;
+        _fecha = new DateFormat.yMMMMEEEEd('es_ES').format(_date).toString();
+      });
+    }
+  }
+
+  //WIDGET PEDIR TURNO
+  Widget pedirturno() {
+    double _width = MediaQuery.of(context).size.width;
+    if (_width > 640) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: EdgeInsets.fromLTRB(200, 20, 200, 50),
+            child: TextFormField(
+              readOnly: true,
+              onTap: () {
+                setState(() {
+                  _selecFecha(context);
+                });
+              },
+              decoration: InputDecoration(
+                  labelText: 'Seleccione Fecha', hintText: _fecha),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.fromLTRB(50, 0, 50, 100),
+            child: TextFormField(
+              readOnly: true,
+              onTap: () {
+                setState(() {
+                  _selecFecha(context);
+                });
+              },
+              decoration: InputDecoration(
+                  labelText: 'Seleccione Fecha', hintText: _fecha),
+            ),
+          ),
+        ],
+      );
+    }
+  }
+
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 1: Mi turno',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: Config',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 3: Contacto',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 4: Acerca de',
-      style: optionStyle,
-    ),
-  ];
+
+  listado(int index) {
+    List<Widget> widgetOptions = <Widget>[
+      pedirturno(),
+      Text('Mi Turno'),
+    ];
+    return widgetOptions.elementAt(index);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -153,7 +207,8 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
           Expanded(
             child: Column(
               children: [
-                _widgetOptions.elementAt(_selectedIndex),
+                listado(_selectedIndex),
+                //widgetOptions.elementAt(_selectedIndex),
               ],
             ),
           ),
@@ -228,7 +283,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
         ]),
       ),
       body: Center(
-        child: Text('Hola usuario'),
+        child: listado(0),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
