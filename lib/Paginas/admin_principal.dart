@@ -24,31 +24,14 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
     });
   }
 
-  int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 1: Mi turno',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: Config',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 3: Contacto',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 4: Acerca de',
-      style: optionStyle,
-    ),
-  ];
+  /* int _selectedIndex = 0;
+  listado(int index) {
+    List<Widget> widgetOptions = <Widget>[
+      Text('Mi Turno'),
+      //TabBarAdmin(),
+    ];
+    return widgetOptions.elementAt(index);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -153,7 +136,7 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
           Expanded(
             child: Column(
               children: [
-                _widgetOptions.elementAt(_selectedIndex),
+                listado(_selectedIndex),
               ],
             ),
           ),
@@ -170,7 +153,7 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
         backgroundColor: Colors.amber.shade700,
       ),
     );
-  }
+  }*/
 
   Widget _pantallaChica() {
     return Scaffold(
@@ -222,7 +205,8 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
           ),
           PersonalListTile(Icons.home, "Home ADMIN", () => {}),
           PersonalListTile(Icons.list, "Mi turno", () => {}),
-          PersonalListTile(Icons.settings, "Configuración", () => {}),
+          PersonalListTile(Icons.settings, "Configuración",
+              () => {Navigator.of(context).pushNamed('/configAdmin')}),
           PersonalListTile(Icons.email, "Contacto", () => {}),
           PersonalListTile(Icons.phone_android, "Acerca de", () => {})
         ]),
@@ -243,13 +227,7 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
-
-    if (_width > 640) {
-      return _pantallaGrande();
-    } else {
-      return _pantallaChica();
-    }
+    return _pantallaChica();
   }
 
   Future<String> obtenerclientes(User user) async {

@@ -94,8 +94,6 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
     }
   }
 
-  int _selectedIndex = 0;
-
   listado(int index) {
     List<Widget> widgetOptions = <Widget>[
       pedirturno(),
@@ -104,7 +102,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
     return widgetOptions.elementAt(index);
   }
 
-  void _onItemTapped(int index) {
+  /* void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -225,7 +223,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
         backgroundColor: Colors.amber.shade700,
       ),
     );
-  }
+  }*/
 
   Widget _pantallaChica() {
     return Scaffold(
@@ -298,13 +296,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
-
-    if (_width > 640) {
-      return _pantallaGrande();
-    } else {
-      return _pantallaChica();
-    }
+    return _pantallaChica();
   }
 }
 

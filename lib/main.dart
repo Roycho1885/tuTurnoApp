@@ -6,6 +6,7 @@ import 'package:splashscreen/splashscreen.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
+import 'package:tuturnoapp/Widgets/configAdmin.dart';
 import 'package:tuturnoapp/Widgets/progressDialog.dart';
 import 'Paginas/user_principal.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +44,7 @@ class App extends StatelessWidget {
         '/prinAdmin': (context) => PrincipalAdmin(),
         '/registro': (context) => Registrar(),
         '/olvicontra': (context) => OlvidePass(),
+        '/configAdmin': (context) => TabBarAdmin(),
       },
     );
   }
@@ -87,26 +89,6 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
       _ocultar = !_ocultar;
     });
   }
-
-  /*showAlertDialog(BuildContext context) {
-    AlertDialog alert = AlertDialog(
-      content: new Row(
-        children: [
-          CircularProgressIndicator(),
-          Container(
-            margin: EdgeInsets.only(left: 5),
-            child: Text('Cargando...'),
-          ),
-        ],
-      ),
-    );
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        });
-  }*/
 
   @override
   void initState() {
