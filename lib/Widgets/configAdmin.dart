@@ -40,10 +40,7 @@ class _TabBarAdminState extends State<TabBarAdmin> {
             child: TabBarView(
               children: [
                 Icon(Icons.flight),
-                Icon(
-                  Icons.car_rental,
-                  size: 150,
-                ),
+                _codigoingreso(),
                 Icon(
                   Icons.train,
                   size: 150,
@@ -92,10 +89,7 @@ class _TabBarAdminState extends State<TabBarAdmin> {
             child: TabBarView(
               children: [
                 Icon(Icons.flight),
-                Icon(
-                  Icons.car_rental,
-                  size: 150,
-                ),
+                _codigoingreso(),
                 Icon(
                   Icons.train,
                   size: 150,
@@ -117,6 +111,44 @@ class _TabBarAdminState extends State<TabBarAdmin> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _codigoingreso() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          'Ingrese nuevo código',
+          style: TextStyle(fontSize: 18),
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          keyboardType: TextInputType.number,
+          maxLength: 6,
+          style: TextStyle(fontSize: 18),
+          decoration: InputDecoration(
+            labelText: 'Código',
+            prefixIcon: Icon(Icons.lock),
+          ),
+        ),
+        SizedBox(height: 20),
+        Text('Código Actual'),
+        SizedBox(height: 5),
+        Text('123456'),
+        SizedBox(height: 50),
+        Container(
+          height: 50,
+          width: 260,
+          child: ElevatedButton(
+            child: Text('Aceptar'),
+            style: OutlinedButton.styleFrom(
+              shape: StadiumBorder(),
+            ),
+            onPressed: () {},
+          ),
+        ),
+      ],
     );
   }
 }

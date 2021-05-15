@@ -37,4 +37,4 @@ flutter:
   fonts:
     - family: Rubik
       fonts:
-        - asset: assets/fonts/Rubik-SemiBold.ttf
+        - asset: assets/fonts/Rubik-Regular.ttf
