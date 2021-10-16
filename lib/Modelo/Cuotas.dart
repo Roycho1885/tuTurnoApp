@@ -9,10 +9,6 @@ class Cuotas {
   Cuotas(this._clientenombre, this._emailcliente, this._fechapago,
       this._fechavenc, this._mespago, this._estadopago);
 
-  Cuotas.vacio();
-
-  Cuotas.modificado(
-      this._clientenombre, this._fechapago, this._fechavenc, this._mespago);
 
   set estadopago(int estadopago) {
     this._estadopago = estadopago;

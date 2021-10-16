@@ -10,7 +10,6 @@ class Turno {
   Turno(this._id, this._horacomienzo, this._disciplina, this._cupo,
       this._cupoalmacenado, this._dias, this._foto);
 
-  Turno.vacio();
 
   set id(String id) {
     this._id = id;

@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:splashscreen/splashscreen.dart';
+import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
@@ -75,6 +77,147 @@ class DespuesDeSplash extends StatefulWidget {
 }
 
 class _DespuesDeSplashState extends State<DespuesDeSplash> {
+  TextEditingController _busquedaControl = TextEditingController();
+
+  Future resultCargados;
+  List _todosLosResult = [];
+  List listaResultados = [];
+
+  getGimnasiosStreamSnapshots() async {
+    var data = await FirebaseFirestore.instance
+        .collection('clientesList')
+        .doc('Gimnasios')
+        .collection('Gimnasios')
+        .get();
+    setState(() {
+      _todosLosResult = data.docs;
+    });
+    busquedaResultLista();
+    return "Completado";
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _busquedaControl.addListener(_onBusquedaCambio);
+  }
+
+  @override
+  void dispose() {
+    _busquedaControl.removeListener(_onBusquedaCambio);
+    _busquedaControl.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    resultCargados = getGimnasiosStreamSnapshots();
+  }
+
+  _onBusquedaCambio() {
+    busquedaResultLista();
+    print(_busquedaControl.text);
+  }
+
+  busquedaResultLista() {
+    var mostrarResultados = [];
+
+    if (_busquedaControl.text != "") {
+      for (var gimSnap in _todosLosResult) {
+        var title = Gimnasios.fromSnapshot(gimSnap).nombre.toLowerCase();
+
+        if (title.contains(_busquedaControl.text.toLowerCase())) {
+          mostrarResultados.add(gimSnap);
+        }
+      }
+    } else {
+      mostrarResultados = List.from(_todosLosResult);
+    }
+    setState(() {
+      listaResultados = mostrarResultados;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('tu Turno'),
+        ),
+        body: Container(
+          child: Column(children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: TextField(
+                onChanged: (value) {},
+                controller: _busquedaControl,
+                decoration: InputDecoration(
+                  labelText: "Buscar",
+                  hintText: "Buscar",
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+                child: ListView.builder(
+              itemCount: listaResultados.length,
+              itemBuilder: (BuildContext context, int index) =>
+                  crearListaCard(context, listaResultados[index]),
+            )),
+          ]),
+        ));
+  }
+}
+
+Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
+  final gimdatos = Gimnasios.fromSnapshot(document);
+
+  return new Container(
+    child: Card(
+      elevation: 10,
+      child: InkWell(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                child: Row(
+                  children: <Widget>[
+                  Image.network(gimdatos.logo, width: 60),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        gimdatos.nombre,
+                        style: TextStyle(fontSize: 18, color: Colors.black87,),
+                      ),
+                      Text(
+                        gimdatos.ubi,
+                        style: TextStyle(fontSize: 15, color: Colors.black38),
+                      ),
+                    ],
+                  )
+                ]),
+              ),
+            ],
+          ),
+        ),
+        onTap: () {},
+      ),
+    ),
+  );
+}
+
+/* class _DespuesDeSplashState extends State<DespuesDeSplash> {
   TextEditingController _controlUsuario;
   TextEditingController _controlContra;
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -374,34 +517,34 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
     }
   }
 
-//OBTENGO CLIENTES PARA SABER SI SON ADMINES
-  Future<String> obtenerclientes(User user) async {
-    String admin;
-    await FirebaseFirestore.instance
-        .collection('clientesPrincipal')
-        .doc('Clientes')
-        .collection('Clientes')
-        .get()
-        .then((QuerySnapshot query) {
-      query.docs.forEach((doc) {
-        if (user.email == doc['email']) {
-          admin = doc['admin'];
-        }
+  //OBTENGO CLIENTES PARA SABER SI SON ADMINES
+    Future<String> obtenerclientes(User user) async {
+      String admin;
+      await FirebaseFirestore.instance
+          .collection('clientesPrincipal')
+          .doc('Clientes')
+          .collection('Clientes')
+          .get()
+          .then((QuerySnapshot query) {
+        query.docs.forEach((doc) {
+          if (user.email == doc['email']) {
+            admin = doc['admin'];
+          }
+        });
       });
-    });
-    return admin;
-  }
+      return admin;
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('tu Turno'),
-      ),
-      body: Center(
-        child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
-      ),
-    );
-  }
-}
+    @override
+    Widget build(BuildContext context) {
+      double _width = MediaQuery.of(context).size.width;
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('tu Turno'),
+        ),
+        body: Center(
+          child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
+        ),
+      );
+    }
+} */

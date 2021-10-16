@@ -24,10 +24,6 @@ class Cliente {
       this._fechavencimiento,
       this._estadopago);
 
-  Cliente.vacio();
-
-  Cliente.modi1(this._apellido, this._nombre, this._ultimopago,
-      this._fechavencimiento, this._estadopago);
 
   Map<String, dynamic> toJson() => {
         'nombre': nombre,
