@@ -125,12 +125,10 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   prefixIcon: Icon(Icons.email),
-                  suffix: GestureDetector(
-                    child: Icon(Icons.backspace),
-                    onTap: () {
-                      _controlUsuario.clear();
-                    },
-                  ),
+                  suffixIcon: IconButton(
+                    onPressed: _controlUsuario.clear,
+                    icon: Icon(Icons.clear),
+                  )
                 ),
               ),
               SizedBox(

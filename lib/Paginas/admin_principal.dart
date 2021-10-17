@@ -214,13 +214,15 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
       body: Center(
         child: Text('dadadddad'),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
+        foregroundColor: Colors.black,
+        label: const Text('Reservar'),
         onPressed: () {},
         tooltip: 'Reservar Turno',
         splashColor: Colors.blueGrey,
         highlightElevation: 20.0,
         backgroundColor: Colors.amber.shade700,
-        child: Icon(Icons.add),
+        icon: const Icon(Icons.add),
       ),
     );
   }

@@ -21,6 +21,7 @@ class _RegistrarState extends State<Registrar> {
   String _email;
   String _contrasena;
   String _codigo;
+  String _catnombre;
   String _rubronombre;
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -412,7 +413,6 @@ class _RegistrarState extends State<Registrar> {
                                 _email,
                                 _contrasena,
                                 _rubronombre = gselec.nombre,
-                                _codigo,
                                 context,
                                 rselec.nombre);
                           } else {
@@ -517,7 +517,6 @@ class _RegistrarState extends State<Registrar> {
                                 _email,
                                 _contrasena,
                                 _rubronombre = gselec.nombre,
-                                _codigo,
                                 context,
                                 rselec.nombre);
                           } else {
@@ -545,9 +544,9 @@ class _RegistrarState extends State<Registrar> {
 
 //METODO REGISTRAR CLIENTE
 Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena,
-    rubronombre, codigo, context, rubselec) async {
+    rubronombre, context, rubselec) async {
   final clienteNuevo = Cliente(nombre, apellido, dni, direccion, email,
-      rubronombre, 'No', 'Nada', 'Nada', 'Nada', 0);
+      rubronombre, 'No', 'Nada', 'Nada', 'Nada', rubselec, 0);
 
   CollectionReference clinuevo =
       FirebaseFirestore.instance.collection('clientesPrincipal');

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TabBarAdmin extends StatefulWidget {
@@ -6,6 +8,23 @@ class TabBarAdmin extends StatefulWidget {
 }
 
 class _TabBarAdminState extends State<TabBarAdmin> {
+  String rubnombre;
+  void initState() {
+    super.initState();
+  }
+
+  obtengocodigo() {
+    String codigotexto;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    obtenerclientes(auth.currentUser).then((value) {
+      obtenercodigo(value).then((value) {
+        print(value);
+        codigotexto = value;
+      });
+    });
+    return Text("codigotexto");
+  }
+
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
@@ -135,7 +154,7 @@ class _TabBarAdminState extends State<TabBarAdmin> {
         SizedBox(height: 20),
         Text('Código Actual'),
         SizedBox(height: 5),
-        Text('123456'),
+        obtengocodigo(),
         SizedBox(height: 50),
         Container(
           height: 50,
@@ -150,5 +169,40 @@ class _TabBarAdminState extends State<TabBarAdmin> {
         ),
       ],
     );
+  }
+
+  Future<String> obtenerclientes(User user) async {
+    String catrub;
+    await FirebaseFirestore.instance
+        .collection('clientesPrincipal')
+        .doc('Clientes')
+        .collection('Clientes')
+        .get()
+        .then((QuerySnapshot query) {
+      query.docs.forEach((doc) {
+        if (user.email == doc['email']) {
+          catrub = doc['catnombre'];
+          rubnombre = doc['rubronombre'];
+        }
+      });
+    });
+    return catrub;
+  }
+
+  Future<String> obtenercodigo(String rubro) async {
+    String codigo;
+    await FirebaseFirestore.instance
+        .collection('clientesList')
+        .doc(rubro)
+        .collection(rubro)
+        .get()
+        .then((QuerySnapshot query) {
+      query.docs.forEach((doc) {
+        if (rubnombre == doc['nombre']) {
+          codigo = doc['codigoacceso'];
+        }
+      });
+    });
+    return codigo;
   }
 }

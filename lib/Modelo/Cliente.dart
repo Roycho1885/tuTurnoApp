@@ -9,6 +9,7 @@ class Cliente {
   String _token;
   String _ultimopago;
   String _fechavencimiento;
+  String _catnombre;
   int _estadopago;
 
   Cliente(
@@ -22,6 +23,7 @@ class Cliente {
       this._token,
       this._ultimopago,
       this._fechavencimiento,
+      this._catnombre,
       this._estadopago);
 
   Cliente.vacio();
@@ -40,6 +42,7 @@ class Cliente {
         'token': token,
         'ultimopago': ultimopago,
         'fechavencimiento': fechavencimiento,
+        'catnombre': catnombre,
         'estadopago': estadopago,
       };
 
@@ -83,6 +86,10 @@ class Cliente {
     this._fechavencimiento = fechavencimiento;
   }
 
+  set catnombre(String catnombre) {
+    this._catnombre = catnombre;
+  }
+
   set estadopago(int estadopago) {
     this._estadopago = estadopago;
   }
@@ -97,6 +104,7 @@ class Cliente {
   String get token => this._token;
   String get ultimopago => this._ultimopago;
   String get fechavencimiento => this._fechavencimiento;
+  String get catnombre => this._catnombre;
   int get estadopago => this._estadopago;
 
   String toString() => _apellido + " " + _nombre + "\n" + "Admin " + _admin;
