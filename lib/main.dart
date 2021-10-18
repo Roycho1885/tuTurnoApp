@@ -47,6 +47,7 @@ class App extends StatelessWidget {
         '/registro': (context) => Registrar(),
         '/olvicontra': (context) => OlvidePass(),
         '/configAdmin': (context) => TabBarAdmin(),
+        '/login': (context) => PantallaLogin(),
       },
     );
   }
@@ -117,7 +118,6 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
 
   _onBusquedaCambio() {
     busquedaResultLista();
-    print(_busquedaControl.text);
   }
 
   busquedaResultLista() {
@@ -187,8 +187,7 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
-                child: Row(
-                  children: <Widget>[
+                child: Row(children: <Widget>[
                   Image.network(gimdatos.logo, width: 60),
                   SizedBox(
                     width: 20,
@@ -198,7 +197,10 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
                     children: [
                       Text(
                         gimdatos.nombre,
-                        style: TextStyle(fontSize: 18, color: Colors.black87,),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black87,
+                        ),
                       ),
                       Text(
                         gimdatos.ubi,
@@ -211,13 +213,20 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
             ],
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).pushNamed('/login');
+        },
       ),
     ),
   );
 }
 
-/* class _DespuesDeSplashState extends State<DespuesDeSplash> {
+class PantallaLogin extends StatefulWidget {
+  @override
+  _PantallaLoginState createState() => _PantallaLoginState();
+}
+
+class _PantallaLoginState extends State<PantallaLogin> {
   TextEditingController _controlUsuario;
   TextEditingController _controlContra;
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -266,15 +275,12 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
                 keyboardType: TextInputType.emailAddress,
                 controller: _controlUsuario,
                 decoration: InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
-                  suffix: GestureDetector(
-                    child: Icon(Icons.backspace),
-                    onTap: () {
-                      _controlUsuario.clear();
-                    },
-                  ),
-                ),
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email),
+                    suffixIcon: IconButton(
+                      onPressed: _controlUsuario.clear,
+                      icon: Icon(Icons.clear),
+                    )),
               ),
               SizedBox(
                 height: 20.0,
@@ -386,15 +392,13 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
                   keyboardType: TextInputType.emailAddress,
                   controller: _controlUsuario,
                   decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
-                    suffix: GestureDetector(
-                      child: Icon(Icons.backspace),
-                      onTap: () {
-                        _controlUsuario.clear();
-                      },
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email),
+                      suffixIcon: IconButton(
+                        onPressed: _controlUsuario.clear,
+                        icon: Icon(Icons.clear),
+                      )
                     ),
-                  ),
                 ),
                 SizedBox(
                   height: 20.0,
@@ -518,33 +522,33 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
   }
 
   //OBTENGO CLIENTES PARA SABER SI SON ADMINES
-    Future<String> obtenerclientes(User user) async {
-      String admin;
-      await FirebaseFirestore.instance
-          .collection('clientesPrincipal')
-          .doc('Clientes')
-          .collection('Clientes')
-          .get()
-          .then((QuerySnapshot query) {
-        query.docs.forEach((doc) {
-          if (user.email == doc['email']) {
-            admin = doc['admin'];
-          }
-        });
+  Future<String> obtenerclientes(User user) async {
+    String admin;
+    await FirebaseFirestore.instance
+        .collection('clientesPrincipal')
+        .doc('Clientes')
+        .collection('Clientes')
+        .get()
+        .then((QuerySnapshot query) {
+      query.docs.forEach((doc) {
+        if (user.email == doc['email']) {
+          admin = doc['admin'];
+        }
       });
-      return admin;
-    }
+    });
+    return admin;
+  }
 
-    @override
-    Widget build(BuildContext context) {
-      double _width = MediaQuery.of(context).size.width;
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('tu Turno'),
-        ),
-        body: Center(
-          child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
-        ),
-      );
-    }
-} */
+  @override
+  Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('tu Turno'),
+      ),
+      body: Center(
+        child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
+      ),
+    );
+  }
+}
