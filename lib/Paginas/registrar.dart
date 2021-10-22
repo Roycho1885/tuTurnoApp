@@ -3,45 +3,49 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
-import 'package:tuturnoapp/Modelo/rubros.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class Registrar extends StatefulWidget {
+  const Registrar({Key? key}) : super(key: key);
   @override
   _RegistrarState createState() => _RegistrarState();
 }
 
 class _RegistrarState extends State<Registrar> {
+  var mascara = new MaskTextInputFormatter(
+      mask: '+54 ###### - ####', filter: {'#': RegExp(r'[0-9]')});
   bool poli = false;
   bool cod = false;
-  String _nombre;
-  String _apellido;
-  String _dni;
-  String _direccion;
-  String _email;
-  String _contrasena;
-  String _codigo;
-  String _rubronombre;
+  late String _nombre;
+  late String _apellido;
+  late String _dni;
+  late String _direccion;
+  late String _telefono;
+  late String _email;
+  late String _contrasena;
+  late String _codigo;
+  late String _nombregym;
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   bool _ocultar = true;
 
-  //DROPDOWN
-  Rubros rselec;
-  Gimnasios gselec;
+  /* //DROPDOWN
+  Rubros? rselec;
+  Gimnasios? gselec;
   List<Rubros> rubrosfeos = [];
   List<Gimnasios> gimfeos = [];
-  //--------------------------------
+  //-------------------------------- */
 
   @override
   void initState() {
     super.initState();
     //OBTENGO LOS RUBROS PRIMERO PARA EL DROPDOWN RUBRO
-    obtenerrubros().then((List<Rubros> valor) {
+    /* obtenerrubros().then((List<Rubros> valor) {
       setState(() {});
       rubrosfeos = valor;
-    });
+    }); */
   }
 
   void _toogleboton() {
@@ -56,14 +60,14 @@ class _RegistrarState extends State<Registrar> {
       keyboardType: TextInputType.text,
       decoration:
           InputDecoration(labelText: 'Nombre', prefixIcon: Icon(Icons.person)),
-      validator: (String value) {
-        if (value.isEmpty) {
+      validator: (value) {
+        if (value!.isEmpty) {
           return 'Ingrese Nombre';
         }
         return null;
       },
-      onSaved: (String value) {
-        _nombre = value.trim();
+      onSaved: (value) {
+        _nombre = value!.trim();
       },
     );
   }
@@ -73,14 +77,14 @@ class _RegistrarState extends State<Registrar> {
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
           labelText: 'Apellido', prefixIcon: Icon(Icons.person)),
-      validator: (String value) {
-        if (value.isEmpty) {
+      validator: (value) {
+        if (value!.isEmpty) {
           return 'Ingrese Apellido';
         }
         return null;
       },
-      onSaved: (String value) {
-        _apellido = value.trim();
+      onSaved: (value) {
+        _apellido = value!.trim();
       },
     );
   }
@@ -91,14 +95,14 @@ class _RegistrarState extends State<Registrar> {
       keyboardType: TextInputType.number,
       decoration:
           InputDecoration(labelText: 'DNI', prefixIcon: Icon(Icons.person)),
-      validator: (String value) {
-        if (value.isEmpty) {
+      validator: (value) {
+        if (value!.isEmpty) {
           return 'Ingrese DNI';
         }
         return null;
       },
-      onSaved: (String value) {
-        _dni = value.trim();
+      onSaved: (value) {
+        _dni = value!.trim();
       },
     );
   }
@@ -108,14 +112,32 @@ class _RegistrarState extends State<Registrar> {
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
           labelText: 'Dirección', prefixIcon: Icon(Icons.person)),
-      validator: (String value) {
-        if (value.isEmpty) {
+      validator: (value) {
+        if (value!.isEmpty) {
           return 'Ingrese Dirección';
         }
         return null;
       },
-      onSaved: (String value) {
-        _direccion = value.trim();
+      onSaved: (value) {
+        _direccion = value!.trim();
+      },
+    );
+  }
+
+  Widget _crearCampoTelefono() {
+    return TextFormField(
+      inputFormatters: [mascara],
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(
+          labelText: 'Teléfono', prefixIcon: Icon(Icons.person)),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Ingrese Teléfono';
+        }
+        return null;
+      },
+      onSaved: (value) {
+        _direccion = value!.trim();
       },
     );
   }
@@ -128,8 +150,8 @@ class _RegistrarState extends State<Registrar> {
         labelText: 'Email',
         prefixIcon: Icon(Icons.email),
       ),
-      validator: (String value) {
-        if (value.isEmpty) {
+      validator: (value) {
+        if (value!.isEmpty) {
           return 'Ingrese Email';
         }
         if (!RegExp(
@@ -140,8 +162,8 @@ class _RegistrarState extends State<Registrar> {
 
         return null;
       },
-      onSaved: (String value) {
-        _email = value.trim();
+      onSaved: (value) {
+        _email = value!.trim();
       },
     );
   }
@@ -158,14 +180,14 @@ class _RegistrarState extends State<Registrar> {
           icon: Icon(Icons.visibility_off),
         ),
       ),
-      validator: (String value) {
-        if (value.isEmpty) {
+      validator: (value) {
+        if (value!.isEmpty) {
           return 'Ingrese Contraseña';
         }
         return null;
       },
-      onSaved: (String value) {
-        _contrasena = value.trim();
+      onSaved: (value) {
+        _contrasena = value!.trim();
       },
     );
   }
@@ -176,14 +198,14 @@ class _RegistrarState extends State<Registrar> {
       maxLength: 6,
       decoration:
           InputDecoration(labelText: 'Código', prefixIcon: Icon(Icons.lock)),
-      validator: (String value) {
-        if (value.isEmpty) {
+      validator: (value) {
+        if (value!.isEmpty) {
           return 'Ingrese Código';
         }
         return null;
       },
-      onSaved: (String value) {
-        _codigo = value.trim();
+      onSaved: (value) {
+        _codigo = value!.trim();
       },
     );
   }
@@ -205,7 +227,7 @@ class _RegistrarState extends State<Registrar> {
       value: poli,
       onChanged: (value) {
         setState(() {
-          this.poli = value;
+          this.poli = value!;
         });
       });
   //-------------------------------------------------------------------
@@ -225,7 +247,7 @@ class _RegistrarState extends State<Registrar> {
   }
   //----------------------------------------------
 
-  Widget _multiplesdropdown() {
+  /* Widget _multiplesdropdown() {
     return Container(
       width: 600,
       height: 200,
@@ -282,16 +304,16 @@ class _RegistrarState extends State<Registrar> {
         ],
       ),
     );
-  }
+  } */
 
-//LOS ONCHANGE PARA LOS DROPDOWNS Y LAS FUNCIONES PARA LISTARLOS DESDE LA DB
+/* //LOS ONCHANGE PARA LOS DROPDOWNS Y LAS FUNCIONES PARA LISTARLOS DESDE LA DB
   void onRubroCambio(rub) {
     setState(() {
       rselec = rub;
       gimfeos = [];
-      gselec = null;
+      gselec;
     });
-    obtenergim(rselec.nombre).then((List<Gimnasios> valor) {
+    obtenergim(rselec!.nombre).then((List<Gimnasios> valor) {
       setState(() {});
       gimfeos = valor;
     });
@@ -301,9 +323,9 @@ class _RegistrarState extends State<Registrar> {
     setState(() {
       gselec = gim;
     });
-  }
+  } */
 
-  Future<List<Rubros>> obtenerrubros() async {
+  /* Future<List<Rubros>> obtenerrubros() async {
     List rubrosmalditos = [];
     await FirebaseFirestore.instance
         .collection('clientesList')
@@ -314,9 +336,9 @@ class _RegistrarState extends State<Registrar> {
       });
     });
     return rubrosmalditos.map((e) => Rubros.fromMap(e)).toList();
-  }
+  } */
 
-  Future<List<Gimnasios>> obtenergim(String elrubroselec) async {
+  /* Future<List<Gimnasios>> obtenergim(String elrubroselec) async {
     List gimmalditos = [];
     await FirebaseFirestore.instance
         .collection('clientesList')
@@ -329,10 +351,11 @@ class _RegistrarState extends State<Registrar> {
       });
     });
     return gimmalditos.map((e) => Gimnasios.fromMap(e)).toList();
-  }
+  } */
   //-----------------------------------------------------------------
 
   Widget _pantallaGrande() {
+    final gimdatos = ModalRoute.of(context)!.settings.arguments as Gimnasios;
     return Scrollbar(
       child: Container(
         padding: EdgeInsets.fromLTRB(200, 5, 200, 5),
@@ -359,6 +382,10 @@ class _RegistrarState extends State<Registrar> {
                   SizedBox(
                     height: 40,
                   ),
+                  _crearCampoTelefono(),
+                  SizedBox(
+                    height: 40,
+                  ),
                   _crearCampoEmail(),
                   SizedBox(
                     height: 40,
@@ -367,7 +394,7 @@ class _RegistrarState extends State<Registrar> {
                   SizedBox(
                     height: 40,
                   ),
-                  _multiplesdropdown(),
+                  //_multiplesdropdown(),
                   SizedBox(
                     height: 40,
                   ),
@@ -384,24 +411,19 @@ class _RegistrarState extends State<Registrar> {
                         shape: StadiumBorder(),
                       ),
                       onPressed: () {
-                        if (!_formkey.currentState.validate()) {
+                        if (!_formkey.currentState!.validate()) {
                           return;
                         } else {
-                          if (rselec == null || gselec == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Seleccione opciones')));
+                          if (!poli) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    'Debe aceptar las Políticas de Privacidad')));
                             return;
-                          } else {
-                            if (!poli) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text(
-                                      'Debe aceptar las Políticas de Privacidad')));
-                              return;
-                            }
                           }
                         }
-                        _formkey.currentState.save();
-                        comprobarcodigo(rselec.nombre, _codigo, gselec.nombre)
+
+                        _formkey.currentState!.save();
+                        /* comprobarcodigo(rselec!.nombre, _codigo, gselec!.nombre)
                             .then((value) {
                           if (value) {
                             registrar(
@@ -409,18 +431,19 @@ class _RegistrarState extends State<Registrar> {
                                 _apellido,
                                 _dni,
                                 _direccion,
+                                _telefono,
                                 _email,
                                 _contrasena,
-                                _rubronombre = gselec.nombre,
+                                _nombregym = gimdatos.nombre,
                                 _codigo,
                                 context,
-                                rselec.nombre);
+                                rselec!.nombre);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content:
                                     Text('El código ingresado no coincide')));
                           }
-                        });
+                        }); */
                       },
                     ),
                   ),
@@ -464,6 +487,10 @@ class _RegistrarState extends State<Registrar> {
                   SizedBox(
                     height: 30,
                   ),
+                  _crearCampoTelefono(),
+                  SizedBox(
+                    height: 30,
+                  ),
                   _crearCampoEmail(),
                   SizedBox(
                     height: 30,
@@ -472,7 +499,7 @@ class _RegistrarState extends State<Registrar> {
                   SizedBox(
                     height: 30,
                   ),
-                  _multiplesdropdown(),
+                  //_multiplesdropdown(),
                   SizedBox(
                     height: 30,
                   ),
@@ -489,24 +516,19 @@ class _RegistrarState extends State<Registrar> {
                         shape: StadiumBorder(),
                       ),
                       onPressed: () {
-                        if (!_formkey.currentState.validate()) {
+                        if (!_formkey.currentState!.validate()) {
                           return;
                         } else {
-                          if (rselec == null || gselec == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Seleccione opciones')));
+                          if (!poli) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    'Debe aceptar las Políticas de Privacidad')));
                             return;
-                          } else {
-                            if (!poli) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text(
-                                      'Debe aceptar las Políticas de Privacidad')));
-                              return;
-                            }
                           }
                         }
-                        _formkey.currentState.save();
-                        comprobarcodigo(rselec.nombre, _codigo, gselec.nombre)
+
+                        _formkey.currentState!.save();
+                        /*   comprobarcodigo(d.nombre, _codigo, gselec!.nombre)
                             .then((value) {
                           if (value) {
                             registrar(
@@ -514,18 +536,19 @@ class _RegistrarState extends State<Registrar> {
                                 _apellido,
                                 _dni,
                                 _direccion,
+                                _telefono,
                                 _email,
                                 _contrasena,
-                                _rubronombre = gselec.nombre,
+                                _nombregym = gimd.nombre,
                                 _codigo,
                                 context,
-                                rselec.nombre);
+                                rselec!.nombre);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content:
                                     Text('El código ingresado no coincide')));
                           }
-                        });
+                        }); */
                       },
                     ),
                   ),
@@ -544,10 +567,10 @@ class _RegistrarState extends State<Registrar> {
 }
 
 //METODO REGISTRAR CLIENTE
-Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena,
-    rubronombre, codigo, context, rubselec) async {
-  final clienteNuevo = Cliente(nombre, apellido, dni, direccion, email,
-      rubronombre, 'No', 'Nada', 'Nada', 'Nada', 0);
+Future<void> registrar(nombre, apellido, dni, direccion, telefono, email,
+    contrasena, nombregym, codigo, context, rubselec) async {
+  final clienteNuevo = Cliente(nombre, apellido, dni, direccion, telefono,
+      email, nombregym, 'No', 'Nada', 'Nada', 'Nada', 0);
 
   CollectionReference clinuevo =
       FirebaseFirestore.instance.collection('clientesPrincipal');
@@ -579,15 +602,15 @@ Future<void> registrar(nombre, apellido, dni, direccion, email, contrasena,
 
 //ENVIO DE VALIDACION CLIENTE
 Future<void> validarcliente(context) async {
-  User clienteEmail = FirebaseAuth.instance.currentUser;
-  if (!clienteEmail.emailVerified) {
+  User? clienteEmail = FirebaseAuth.instance.currentUser;
+  if (!clienteEmail!.emailVerified) {
     await clienteEmail.sendEmailVerification();
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text('Email enviado con éxito')));
   }
 }
 
-//COMPRUEBO EL CODIGO DE ACCESO
+/* //COMPRUEBO EL CODIGO DE ACCESO
 Future<bool> comprobarcodigo(
     String nombrerubro, String codigolocal, String nombrelocal) async {
   bool verdadero = false;
@@ -604,4 +627,4 @@ Future<bool> comprobarcodigo(
     });
   });
   return verdadero;
-}
+} */

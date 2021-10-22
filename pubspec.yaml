@@ -5,7 +5,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.11.0 <3.0.0"
+  sdk: ">=2.14.3 <3.0.0"
 
 
 dependencies:
@@ -17,12 +17,14 @@ dependencies:
   firebase_core: "^1.7.0"
   cloud_firestore: "^2.5.3"
   url_launcher: ^6.0.3
-  splashscreen: ^1.3.5
+  splash_screen_view: ^3.0.0
+  mask_text_input_formatter: ^2.0.0
   intl: ^0.17.0
   
 
   cupertino_icons: ^1.0.2
   provider: ^6.0.1
+  
 
 dev_dependencies:
   flutter_test:
@@ -32,9 +34,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-      - assets/images/logo.png
+      - assets/images/logogristran.png
       - assets/images/logogris.png
       - assets/images/tuturnoicon.png
+      - assets/images/fondo.png
+      - assets/images/fondo512.png
   fonts:
     - family: Rubik
       fonts:

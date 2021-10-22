@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // ignore: must_be_immutable
 class ProgressDialog extends StatelessWidget {
   String mensaje;
-  ProgressDialog({this.mensaje});
+  ProgressDialog({required this.mensaje});
   @override
   Widget build(BuildContext context) {
     return Dialog(

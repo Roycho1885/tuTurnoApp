@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:splashscreen/splashscreen.dart';
+import 'package:splash_screen_view/SplashScreenView.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
@@ -39,7 +39,10 @@ class App extends StatelessWidget {
       locale: const Locale('es'),
       debugShowCheckedModeBanner: false,
       title: 'tuTurno',
-      theme: ThemeData(primarySwatch: Colors.indigo, fontFamily: 'Rubik'),
+      theme: ThemeData(
+          primarySwatch: Colors.indigo,
+          fontFamily: 'Rubik',
+          visualDensity: VisualDensity.adaptivePlatformDensity),
       routes: {
         '/': (context) => PantallaInicial(),
         '/prinUsuario': (context) => PrincipalUsuario(),
@@ -61,13 +64,11 @@ class PantallaInicial extends StatefulWidget {
 class _PantallaInicialState extends State<PantallaInicial> {
   @override
   Widget build(BuildContext context) {
-    return new SplashScreen(
-      seconds: 3,
-      navigateAfterSeconds: DespuesDeSplash(),
-      image: Image.asset('assets/images/logo.png'),
-      photoSize: 80,
-      loaderColor: Colors.amber.shade400,
-      loadingText: Text('Cargando...'),
+    return new SplashScreenView(
+      navigateRoute: DespuesDeSplash(),
+      duration: 3000,
+      imageSrc: 'assets/images/tuturnoicon.png',
+      imageSize: 180,
     );
   }
 }
@@ -80,7 +81,7 @@ class DespuesDeSplash extends StatefulWidget {
 class _DespuesDeSplashState extends State<DespuesDeSplash> {
   TextEditingController _busquedaControl = TextEditingController();
 
-  Future resultCargados;
+  late Future resultCargados;
   List _todosLosResult = [];
   List listaResultados = [];
 
@@ -141,7 +142,6 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
           title: Text('tu Turno'),
@@ -163,6 +163,11 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
                 ),
               ),
             ),
+            SizedBox(height: 5),
+            Text(
+              "Selecciona tu gimnasio",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             Expanded(
                 child: ListView.builder(
               itemCount: listaResultados.length,
@@ -179,6 +184,9 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
 
   return new Container(
     child: Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
       elevation: 10,
       child: InkWell(
         child: Padding(
@@ -188,7 +196,14 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
                 child: Row(children: <Widget>[
-                  Image.network(gimdatos.logo, width: 60),
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.black,
+                    child: Image.network(
+                      gimdatos.logo,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                   SizedBox(
                     width: 20,
                   ),
@@ -204,7 +219,7 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
                       ),
                       Text(
                         gimdatos.ubi,
-                        style: TextStyle(fontSize: 15, color: Colors.black38),
+                        style: TextStyle(fontSize: 12, color: Colors.black38),
                       ),
                     ],
                   )
@@ -214,7 +229,11 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
           ),
         ),
         onTap: () {
-          Navigator.of(context).pushNamed('/login');
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const PantallaLogin(),
+                  settings: RouteSettings(arguments: gimdatos)));
         },
       ),
     ),
@@ -222,13 +241,14 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
 }
 
 class PantallaLogin extends StatefulWidget {
+  const PantallaLogin({Key? key}) : super(key: key);
   @override
   _PantallaLoginState createState() => _PantallaLoginState();
 }
 
 class _PantallaLoginState extends State<PantallaLogin> {
-  TextEditingController _controlUsuario;
-  TextEditingController _controlContra;
+  late TextEditingController _controlUsuario;
+  late TextEditingController _controlContra;
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   final _formkey = GlobalKey<FormState>();
@@ -250,112 +270,188 @@ class _PantallaLoginState extends State<PantallaLogin> {
   }
 
   Widget _pantallaGrande() {
+    final gimdatos = ModalRoute.of(context)!.settings.arguments as Gimnasios;
     return Container(
-      padding: EdgeInsets.fromLTRB(200, 5, 200, 5),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formkey,
-          child: Column(
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/images/fondo.png'), fit: BoxFit.cover)),
+      child: Form(
+        key: _formkey,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: ListView(
             children: [
-              Image.asset('assets/images/logo.png', width: 250, height: 210),
-              TextFormField(
-                style: TextStyle(fontSize: 18),
-                enableSuggestions: true,
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return 'Ingrese Email';
-                  }
-                  if (!RegExp(
-                          r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                      .hasMatch(value)) {
-                    return 'Por favor ingrese un email válido';
-                  }
-                  return null;
-                },
-                keyboardType: TextInputType.emailAddress,
-                controller: _controlUsuario,
-                decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
-                    suffixIcon: IconButton(
-                      onPressed: _controlUsuario.clear,
-                      icon: Icon(Icons.clear),
-                    )),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextFormField(
-                style: TextStyle(fontSize: 18),
-                validator: (val) => val.isEmpty ? "Ingrese Contraseña" : null,
-                controller: _controlContra,
-                obscureText: _ocultar,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
-                  prefixIcon: Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    onPressed: _toogleboton,
-                    icon: Icon(Icons.visibility_off),
-                  ),
-                ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(
+                    gimdatos.logo,
+                    width: 140,
+                  )
+                ],
               ),
               SizedBox(
                 height: 20,
               ),
-              Container(
-                width: 260,
-                height: 50,
-                child: ElevatedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: StadiumBorder(),
+              Padding(
+                padding: EdgeInsets.all(30),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      )
+                    ],
                   ),
-                  onPressed: () {
-                    //ACA SE INICIA SESION AL USUARIO
-                    if (_formkey.currentState.validate()) {
-                      showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return ProgressDialog(
-                              mensaje: 'Accediendo...',
-                            );
-                          });
-                      login();
-                    }
-                  },
-                  child: Text('Iniciar Sesión'),
-                ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Container(
-                width: 260,
-                height: 50,
-                child: ElevatedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: StadiumBorder(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 5),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                        child: TextFormField(
+                          style: TextStyle(fontSize: 18),
+                          enableSuggestions: true,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Ingrese Email';
+                            }
+                            if (!RegExp(
+                                    r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                                .hasMatch(value)) {
+                              return 'Por favor ingrese un email válido';
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _controlUsuario,
+                          decoration: InputDecoration(
+                              labelText: 'Email',
+                              prefixIcon: Icon(Icons.email),
+                              suffixIcon: IconButton(
+                                onPressed: _controlUsuario.clear,
+                                icon: Icon(Icons.clear),
+                              )),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                        child: TextFormField(
+                          style: TextStyle(fontSize: 18),
+                          validator: (val) =>
+                              val!.isEmpty ? "Ingrese Contraseña" : null,
+                          controller: _controlContra,
+                          obscureText: _ocultar,
+                          decoration: InputDecoration(
+                            labelText: 'Contraseña',
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: IconButton(
+                              onPressed: _toogleboton,
+                              icon: Icon(Icons.visibility_off),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(),
+                            side: BorderSide(color: Colors.white)),
+                        onPressed: () {
+                          //ACA SE INICIA SESION AL USUARIO
+                          if (_formkey.currentState!.validate()) {
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return ProgressDialog(
+                                    mensaje: 'Accediendo...',
+                                  );
+                                });
+                            login();
+                          }
+                        },
+                        child: Container(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(15),
+                                    child: Text(
+                                      'Iniciar Sesión',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(20),
+                                    bottomRight: Radius.circular(20))),
+                            side: BorderSide(color: Colors.white)),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Registrar(),
+                                  settings:
+                                      RouteSettings(arguments: gimdatos)));
+                        },
+                        child: Container(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(15),
+                                    child: Text(
+                                      'Registrarse',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: StadiumBorder(),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/olvicontra');
+                        },
+                        child: Text('¿Olvidaste tu contraseña?'),
+                      ),
+                    ],
                   ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/registro');
-                  },
-                  child: Text('Registrarse'),
-                ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Container(
-                width: 200,
-                height: 40,
-                child: TextButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: StadiumBorder(),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/olvicontra');
-                  },
-                  child: Text('¿Olvidaste tu contraseña?'),
                 ),
               ),
             ],
@@ -366,118 +462,192 @@ class _PantallaLoginState extends State<PantallaLogin> {
   }
 
   Widget _pantallaChica() {
+    final gimdatos = ModalRoute.of(context)!.settings.arguments as Gimnasios;
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formkey,
-            child: Column(
-              children: [
-                Image.asset('assets/images/logo.png', width: 160, height: 160),
-                TextFormField(
-                  style: TextStyle(fontSize: 18),
-                  enableSuggestions: true,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return 'Ingrese Email';
-                    }
-                    if (!RegExp(
-                            r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                        .hasMatch(value)) {
-                      return 'Por favor ingrese un email válido';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _controlUsuario,
-                  decoration: InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email),
-                      suffixIcon: IconButton(
-                        onPressed: _controlUsuario.clear,
-                        icon: Icon(Icons.clear),
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/images/fondo512.png'),
+              fit: BoxFit.cover)),
+      child: Form(
+        key: _formkey,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: ListView(
+            children: [
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(
+                    gimdatos.logo,
+                    width: 100,
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: EdgeInsets.all(30),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
                       )
-                    ),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                TextFormField(
-                  style: TextStyle(fontSize: 18),
-                  validator: (val) => val.isEmpty ? "Ingrese Contraseña" : null,
-                  controller: _controlContra,
-                  obscureText: _ocultar,
-                  decoration: InputDecoration(
-                    labelText: 'Contraseña',
-                    prefixIcon: Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      onPressed: _toogleboton,
-                      icon: Icon(Icons.visibility_off),
-                    ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 5),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                        child: TextFormField(
+                          style: TextStyle(fontSize: 15),
+                          enableSuggestions: true,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Ingrese Email';
+                            }
+                            if (!RegExp(
+                                    r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                                .hasMatch(value)) {
+                              return 'Por favor ingrese un email válido';
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _controlUsuario,
+                          decoration: InputDecoration(
+                              labelText: 'Email',
+                              prefixIcon: Icon(Icons.email),
+                              suffixIcon: IconButton(
+                                onPressed: _controlUsuario.clear,
+                                icon: Icon(Icons.clear),
+                              )),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                        child: TextFormField(
+                          style: TextStyle(fontSize: 15),
+                          validator: (val) =>
+                              val!.isEmpty ? "Ingrese Contraseña" : null,
+                          controller: _controlContra,
+                          obscureText: _ocultar,
+                          decoration: InputDecoration(
+                            labelText: 'Contraseña',
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: IconButton(
+                              onPressed: _toogleboton,
+                              icon: Icon(Icons.visibility_off),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(),
+                            side: BorderSide(color: Colors.white)),
+                        onPressed: () {
+                          //ACA SE INICIA SESION AL USUARIO
+                          if (_formkey.currentState!.validate()) {
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return ProgressDialog(
+                                    mensaje: 'Accediendo...',
+                                  );
+                                });
+                            login();
+                          }
+                        },
+                        child: Container(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(15),
+                                    child: Text(
+                                      'Iniciar Sesión',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(20),
+                                    bottomRight: Radius.circular(20))),
+                            side: BorderSide(color: Colors.white)),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Registrar(),
+                                  settings:
+                                      RouteSettings(arguments: gimdatos)));
+                        },
+                        child: Container(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(15),
+                                    child: Text(
+                                      'Registrarse',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: StadiumBorder(),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/olvicontra');
+                        },
+                        child: Text('¿Olvidaste tu contraseña?'),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      //ACA SE INICIA SESION AL USUARIO
-                      if (_formkey.currentState.validate()) {
-                        showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return ProgressDialog(
-                                mensaje: 'Accediendo...',
-                              );
-                            });
-                        login();
-                      }
-                    },
-                    child: Text('Iniciar Sesión'),
-                  ),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Container(
-                  width: 260,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/registro');
-                    },
-                    child: Text('Registrarse'),
-                  ),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Container(
-                  width: 200,
-                  height: 40,
-                  child: TextButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/olvicontra');
-                    },
-                    child: Text('¿Olvidaste tu contraseña?'),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -487,18 +657,18 @@ class _PantallaLoginState extends State<PantallaLogin> {
   //FUNCION LOGIN
   void login() async {
     try {
-      final User user = (await _auth.signInWithEmailAndPassword(
+      final User? user = (await _auth.signInWithEmailAndPassword(
               email: _controlUsuario.text.trim(),
               password: _controlContra.text.trim()))
           .user;
-      obtenerclientes(user).then((value) {
+      obtenerclientes(user!).then((value) {
         if (value == 'Si') {
           Navigator.of(context).pushNamed('/prinAdmin');
         } else {
           Navigator.of(context).pushNamed('/prinUsuario');
         }
       });
-      _formkey.currentState.reset();
+      _formkey.currentState!.reset();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -523,7 +693,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
 
   //OBTENGO CLIENTES PARA SABER SI SON ADMINES
   Future<String> obtenerclientes(User user) async {
-    String admin;
+    String admin = "";
     await FirebaseFirestore.instance
         .collection('clientesPrincipal')
         .doc('Clientes')

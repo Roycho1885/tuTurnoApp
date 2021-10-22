@@ -6,9 +6,8 @@ class Gimnasios {
   String codigoacceso;
   String ubi;
 
-  Gimnasios({this.nombre, this.logo, this.codigoacceso, this.ubi});
+  Gimnasios({required this.nombre, required this.logo, required this.codigoacceso, required this.ubi});
 
-  Gimnasios.vacio();
 
   set setnombre(String nombre) {
     this.nombre = nombre;

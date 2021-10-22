@@ -10,15 +10,13 @@ class PrincipalUsuario extends StatefulWidget {
 }
 
 class _PrincipalUsuarioState extends State<PrincipalUsuario> {
-  String useremail;
+  String useremail="";
   @override
   void initState() {
     super.initState();
     FirebaseAuth auth = FirebaseAuth.instance;
-    if (auth != null) {
-      useremail = auth.currentUser.email;
-    }
-    obtenerclientes(auth.currentUser).then((value) {
+    useremail = auth.currentUser!.email!;
+    obtenerclientes(auth.currentUser!).then((value) {
       if (value == 'Si') {
         Navigator.of(context).pushNamed('/');
       }
@@ -27,10 +25,10 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
 
   //INPUT DE FECHA
   DateTime _date = DateTime.now();
-  String _fecha;
+  String _fecha="";
 
   Future<Null> _selecFecha(BuildContext context) async {
-    DateTime _datePicker = await showDatePicker(
+    DateTime? _datePicker = await showDatePicker(
       context: context,
       initialDate: _date.weekday == 7
           ? DateTime(
@@ -273,11 +271,11 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
               ),
             ),
           ),
-          PersonalListTile(Icons.home, "Home USUARIO", () => {}),
+          /* PersonalListTile(Icons.home, "Home USUARIO", () => {}),
           PersonalListTile(Icons.list, "Mi turno", () => {}),
           PersonalListTile(Icons.settings, "Configuración", () => {}),
           PersonalListTile(Icons.email, "Contacto", () => {}),
-          PersonalListTile(Icons.phone_android, "Acerca de", () => {})
+          PersonalListTile(Icons.phone_android, "Acerca de", () => {}) */
         ]),
       ),
       body: Center(
@@ -301,7 +299,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
 }
 
 Future<String> obtenerclientes(User user) async {
-  String admin;
+  String admin="";
   await FirebaseFirestore.instance
       .collection('clientesPrincipal')
       .doc('Clientes')
@@ -334,7 +332,7 @@ class PersonalListTile extends StatelessWidget {
             border: Border(bottom: BorderSide(color: Colors.grey.shade400))),
         child: InkWell(
           splashColor: Colors.blueGrey,
-          onTap: onTap,
+          onTap: onTap(),
           child: Container(
             height: 50,
             child: Row(

@@ -6,7 +6,7 @@ class OlvidePass extends StatefulWidget {
 }
 
 final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-String _email;
+String _email= "";
 
 Widget _crearCampoEmail() {
   return TextFormField(
@@ -16,8 +16,8 @@ Widget _crearCampoEmail() {
       labelText: 'Email',
       prefixIcon: Icon(Icons.email),
     ),
-    validator: (String value) {
-      if (value.isEmpty) {
+    validator: (value) {
+      if (value!.isEmpty) {
         return 'Ingrese Email';
       }
       if (!RegExp(
@@ -28,8 +28,8 @@ Widget _crearCampoEmail() {
 
       return null;
     },
-    onSaved: (String value) {
-      _email = value;
+    onSaved: (value) {
+      _email = value!;
     },
   );
 }
@@ -72,10 +72,10 @@ Widget _pantallaGrande() {
                     shape: StadiumBorder(),
                   ),
                   onPressed: () {
-                    if (!_formkey.currentState.validate()) {
+                    if (!_formkey.currentState!.validate()) {
                       return;
                     }
-                    _formkey.currentState.save();
+                    _formkey.currentState!.save();
                   },
                 ),
               ),
@@ -110,10 +110,10 @@ Widget _pantallaChica() {
                     shape: StadiumBorder(),
                   ),
                   onPressed: () {
-                    if (!_formkey.currentState.validate()) {
+                    if (!_formkey.currentState!.validate()) {
                       return;
                     }
-                    _formkey.currentState.save();
+                    _formkey.currentState!.save();
                   },
                 ),
               ),

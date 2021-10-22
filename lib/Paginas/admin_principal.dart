@@ -9,15 +9,13 @@ class PrincipalAdmin extends StatefulWidget {
 }
 
 class _PrincipalAdminState extends State<PrincipalAdmin> {
-  String useremail;
+  String useremail= "";
   @override
   void initState() {
     super.initState();
     FirebaseAuth auth = FirebaseAuth.instance;
-    if (auth != null) {
-      useremail = auth.currentUser.email;
-    }
-    obtenerclientes(auth.currentUser).then((value) {
+    useremail = auth.currentUser!.email!;
+    obtenerclientes(auth.currentUser!).then((value) {
       if (value == 'No') {
         Navigator.of(context).pushNamed('/');
       }
@@ -231,7 +229,7 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
   }
 
   Future<String> obtenerclientes(User user) async {
-    String admin;
+    String admin = "";
     await FirebaseFirestore.instance
         .collection('clientesPrincipal')
         .doc('Clientes')
