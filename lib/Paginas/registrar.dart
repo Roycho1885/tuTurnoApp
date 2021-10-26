@@ -98,6 +98,10 @@ class _RegistrarState extends State<Registrar> {
       validator: (value) {
         if (value!.isEmpty) {
           return 'Ingrese DNI';
+        } else {
+          if (value.length != 8) {
+            return "Ingrese DNI completo";
+          }
         }
         return null;
       },
@@ -127,17 +131,21 @@ class _RegistrarState extends State<Registrar> {
   Widget _crearCampoTelefono() {
     return TextFormField(
       inputFormatters: [mascara],
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.phone,
       decoration: InputDecoration(
           labelText: 'Teléfono', prefixIcon: Icon(Icons.person)),
       validator: (value) {
         if (value!.isEmpty) {
           return 'Ingrese Teléfono';
+        } else {
+          if (value.length != 17) {
+            return "Ingrese el número completo";
+          }
         }
         return null;
       },
       onSaved: (value) {
-        _direccion = value!.trim();
+        _telefono = value!.trim();
       },
     );
   }
@@ -423,10 +431,8 @@ class _RegistrarState extends State<Registrar> {
                         }
 
                         _formkey.currentState!.save();
-                        /* comprobarcodigo(rselec!.nombre, _codigo, gselec!.nombre)
-                            .then((value) {
-                          if (value) {
-                            registrar(
+                        if(_codigo == gimdatos.codigoacceso){
+                          registrar(
                                 _nombre,
                                 _apellido,
                                 _dni,
@@ -436,14 +442,12 @@ class _RegistrarState extends State<Registrar> {
                                 _contrasena,
                                 _nombregym = gimdatos.nombre,
                                 _codigo,
-                                context,
-                                rselec!.nombre);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                context);
+                        }else{
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content:
                                     Text('El código ingresado no coincide')));
-                          }
-                        }); */
+                        }
                       },
                     ),
                   ),
@@ -568,12 +572,12 @@ class _RegistrarState extends State<Registrar> {
 
 //METODO REGISTRAR CLIENTE
 Future<void> registrar(nombre, apellido, dni, direccion, telefono, email,
-    contrasena, nombregym, codigo, context, rubselec) async {
+    contrasena, nombregym, codigo, context) async {
   final clienteNuevo = Cliente(nombre, apellido, dni, direccion, telefono,
       email, nombregym, 'No', 'Nada', 'Nada', 'Nada', 0);
 
   CollectionReference clinuevo =
-      FirebaseFirestore.instance.collection('clientesPrincipal');
+      FirebaseFirestore.instance.collection('clientesList');
 
   try {
     UserCredential userCreden = await FirebaseAuth.instance
@@ -582,8 +586,10 @@ Future<void> registrar(nombre, apellido, dni, direccion, telefono, email,
     validarcliente(context);
     Navigator.of(context).pushNamed('/');
     return clinuevo
-        .doc('Clientes')
-        .collection('Clientes')
+        .doc('Gimnasios')
+        .collection('Gimnasios')
+        .doc(nombregym)
+        .collection("Clientes")
         .add(clienteNuevo.toJson())
         .then((value) => ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Cliente registrado con éxito'))));

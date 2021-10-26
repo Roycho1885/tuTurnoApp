@@ -13,6 +13,7 @@ import 'package:tuturnoapp/Widgets/progressDialog.dart';
 import 'Paginas/user_principal.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
@@ -29,6 +30,19 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      builder: (context, widget) => ResponsiveWrapper.builder(
+        BouncingScrollWrapper.builder(context, widget!),
+        maxWidth: 2460,
+        minWidth: 450,
+        defaultScale: true,
+        breakpoints: [
+          ResponsiveBreakpoint.resize(450, name: MOBILE),
+          ResponsiveBreakpoint.autoScale(800, name: TABLET),
+          ResponsiveBreakpoint.autoScale(1000, name: TABLET),
+          ResponsiveBreakpoint.resize(1200, name: DESKTOP),
+          ResponsiveBreakpoint.autoScale(2460, name: "4K"),
+        ],
+      ),
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -376,7 +390,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
                                     mensaje: 'Accediendo...',
                                   );
                                 });
-                            login();
+                            login(gimdatos.nombre);
                           }
                         },
                         child: Container(
@@ -569,7 +583,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
                                     mensaje: 'Accediendo...',
                                   );
                                 });
-                            login();
+                            login(gimdatos.nombre);
                           }
                         },
                         child: Container(
@@ -655,17 +669,22 @@ class _PantallaLoginState extends State<PantallaLogin> {
   }
 
   //FUNCION LOGIN
-  void login() async {
+  void login(String nombregym) async {
     try {
       final User? user = (await _auth.signInWithEmailAndPassword(
               email: _controlUsuario.text.trim(),
               password: _controlContra.text.trim()))
           .user;
-      obtenerclientes(user!).then((value) {
+      obtenerclientes(user!, nombregym).then((value) {
         if (value == 'Si') {
           Navigator.of(context).pushNamed('/prinAdmin');
         } else {
-          Navigator.of(context).pushNamed('/prinUsuario');
+          if (value == "") {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('No se encuentra registrado en este gimnasio')));
+          } else {
+            Navigator.of(context).pushNamed('/prinUsuario');
+          }
         }
       });
       _formkey.currentState!.reset();
@@ -692,16 +711,18 @@ class _PantallaLoginState extends State<PantallaLogin> {
   }
 
   //OBTENGO CLIENTES PARA SABER SI SON ADMINES
-  Future<String> obtenerclientes(User user) async {
+  Future<String> obtenerclientes(User user, String nombregym) async {
     String admin = "";
     await FirebaseFirestore.instance
-        .collection('clientesPrincipal')
-        .doc('Clientes')
+        .collection('clientesList')
+        .doc('Gimnasios')
+        .collection('Gimnasios')
+        .doc(nombregym)
         .collection('Clientes')
         .get()
         .then((QuerySnapshot query) {
       query.docs.forEach((doc) {
-        if (user.email == doc['email']) {
+        if (user.email == doc['email'] && doc['nombregym'] == nombregym) {
           admin = doc['admin'];
         }
       });
@@ -717,7 +738,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
         title: Text('tu Turno'),
       ),
       body: Center(
-        child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
+        child: _pantallaGrande()
       ),
     );
   }
