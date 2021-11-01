@@ -1,31 +1,32 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Cliente {
-  String _nombre;
-  String _apellido;
-  String _dni;
-  String _direccion;
-  String _telefono;
-  String _email;
-  String _nombregym;
-  String _admin;
-  String _token;
-  String _ultimopago;
-  String _fechavencimiento;
-  int _estadopago;
+  String nombre;
+  String apellido;
+  String dni;
+  String direccion;
+  String telefono;
+  String email;
+  String nombregym;
+  String admin;
+  String token;
+  String ultimopago;
+  String fechavencimiento;
+  int estadopago;
 
   Cliente(
-      this._nombre,
-      this._apellido,
-      this._dni,
-      this._direccion,
-      this._telefono,
-      this._email,
-      this._nombregym,
-      this._admin,
-      this._token,
-      this._ultimopago,
-      this._fechavencimiento,
-      this._estadopago);
-
+      {required this.nombre,
+      required this.apellido,
+      required this.dni,
+      required this.direccion,
+      required this.telefono,
+      required this.email,
+      required this.nombregym,
+      required this.admin,
+      required this.token,
+      required this.ultimopago,
+      required this.fechavencimiento,
+      required this.estadopago});
 
   Map<String, dynamic> toJson() => {
         'nombre': nombre,
@@ -42,66 +43,78 @@ class Cliente {
         'estadopago': estadopago,
       };
 
-  set nombre(String nombre) {
-    this._nombre = nombre;
+  set setnombre(String nombre) {
+    this.nombre = nombre;
   }
 
-  set apellido(String apellido) {
-    this._apellido = apellido;
+  set setapellido(String apellido) {
+    this.apellido = apellido;
   }
 
-  set dni(String dni) {
-    this._dni = dni;
+  set setdni(String dni) {
+    this.dni = dni;
   }
 
-  set dirreccion(String direccion) {
-    this._direccion = direccion;
+  set setdirreccion(String direccion) {
+    this.direccion = direccion;
   }
 
-  set telefono(String telefono) {
-    this._telefono = telefono;
+  set settelefono(String telefono) {
+    this.telefono = telefono;
   }
 
-  set email(String email) {
-    this._email = email;
+  set setemail(String email) {
+    this.email = email;
   }
 
-  set gym(String nombregym) {
-    this._nombregym = nombregym;
+  set setgym(String nombregym) {
+    this.nombregym = nombregym;
   }
 
-  set admin(String admin) {
-    this._admin = admin;
+  set setadmin(String admin) {
+    this.admin = admin;
   }
 
-  set token(String token) {
-    this._token = token;
+  set settoken(String token) {
+    this.token = token;
   }
 
-  set ultimopago(String ultimopago) {
-    this._ultimopago = ultimopago;
+  set setultimopago(String ultimopago) {
+    this.ultimopago = ultimopago;
   }
 
-  set fechavencimiento(String fechavencimiento) {
-    this._fechavencimiento = fechavencimiento;
+  set setfechavencimiento(String fechavencimiento) {
+    this.fechavencimiento = fechavencimiento;
   }
 
-  set estadopago(int estadopago) {
-    this._estadopago = estadopago;
+  set setestadopago(int estadopago) {
+    this.estadopago = estadopago;
   }
 
-  String get nombre => this._nombre;
-  String get apellido => this._apellido;
-  String get dni => this._dni;
-  String get direccion => this._direccion;
-  String get telefono => this._telefono;
-  String get email => this._email;
-  String get nombregym => this._nombregym;
-  String get admin => this._admin;
-  String get token => this._token;
-  String get ultimopago => this._ultimopago;
-  String get fechavencimiento => this._fechavencimiento;
-  int get estadopago => this._estadopago;
+  String get getnombre => this.nombre;
+  String get getapellido => this.apellido;
+  String get getdni => this.dni;
+  String get getdireccion => this.direccion;
+  String get gettelefono => this.telefono;
+  String get getemail => this.email;
+  String get getnombregym => this.nombregym;
+  String get getadmin => this.admin;
+  String get gettoken => this.token;
+  String get getultimopago => this.ultimopago;
+  String get getfechavencimiento => this.fechavencimiento;
+  int get getestadopago => this.estadopago;
 
-  String toString() => _apellido + " " + _nombre + "\n" + "Admin " + _admin;
+  Cliente.fromSnapshot(DocumentSnapshot snapshot)
+      : nombre = snapshot["nombre"],
+        apellido = snapshot["apellido"],
+        dni = snapshot["dni"],
+        direccion = snapshot["direccion"],
+        telefono = snapshot["telefono"],
+        email = snapshot["email"],
+        nombregym = snapshot["nombregym"],
+        admin = snapshot["admin"],
+        token = snapshot["token"],
+        ultimopago = snapshot["ultimopago"],
+        fechavencimiento = snapshot["fechavencimiento"],
+        estadopago = snapshot["estadopago"];
 }

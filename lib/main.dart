@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
+import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
@@ -60,7 +61,7 @@ class App extends StatelessWidget {
       routes: {
         '/': (context) => PantallaInicial(),
         '/prinUsuario': (context) => PrincipalUsuario(),
-        '/prinAdmin': (context) => PrincipalAdmin(),
+        '/prinAdmin': (context) => PrincipalAdmin(pasoDatosGim: null,),
         '/registro': (context) => Registrar(),
         '/olvicontra': (context) => OlvidePass(),
         '/configAdmin': (context) => TabBarAdmin(),
@@ -390,7 +391,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
                                     mensaje: 'Accediendo...',
                                   );
                                 });
-                            login(gimdatos.nombre);
+                            login(gimdatos);
                           }
                         },
                         child: Container(
@@ -475,7 +476,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
     );
   }
 
-  Widget _pantallaChica() {
+  /* Widget _pantallaChica() {
     final gimdatos = ModalRoute.of(context)!.settings.arguments as Gimnasios;
     return Container(
       decoration: BoxDecoration(
@@ -666,18 +667,21 @@ class _PantallaLoginState extends State<PantallaLogin> {
         ),
       ),
     );
-  }
+  } */
 
   //FUNCION LOGIN
-  void login(String nombregym) async {
+  void login(Gimnasios datosGim) async {
     try {
       final User? user = (await _auth.signInWithEmailAndPassword(
               email: _controlUsuario.text.trim(),
               password: _controlContra.text.trim()))
           .user;
-      obtenerclientes(user!, nombregym).then((value) {
+      obtenerclientes(user!, datosGim.nombre).then((value) {
         if (value == 'Si') {
-          Navigator.of(context).pushNamed('/prinAdmin');
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => PrincipalAdmin(pasoDatosGim: datosGim)));
         } else {
           if (value == "") {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -732,14 +736,12 @@ class _PantallaLoginState extends State<PantallaLogin> {
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
+    //double _width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('tu Turno'),
       ),
-      body: Center(
-        child: _pantallaGrande()
-      ),
+      body: Center(child: _pantallaGrande()),
     );
   }
 }

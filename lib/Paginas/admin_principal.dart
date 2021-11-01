@@ -2,54 +2,116 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:tuturnoapp/Paginas/user_principal.dart';
+import 'package:flip_card/flip_card.dart';
+import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 
 class PrincipalAdmin extends StatefulWidget {
+  final Gimnasios? pasoDatosGim;
+
+  const PrincipalAdmin({Key? key, required this.pasoDatosGim})
+      : super(key: key);
   @override
   _PrincipalAdminState createState() => _PrincipalAdminState();
 }
 
 class _PrincipalAdminState extends State<PrincipalAdmin> {
-  String useremail = "";
+  String nombreDelCli = "";
   @override
   void initState() {
     super.initState();
     FirebaseAuth auth = FirebaseAuth.instance;
-    useremail = auth.currentUser!.email!;
-    obtenerclientes(auth.currentUser!).then((value) {
-      if (value == 'No') {
-        Navigator.of(context).pushNamed('/');
-      }
+    obtenerclientes(auth.currentUser!, widget.pasoDatosGim!.nombre)
+        .then((value) {
+      setState(() {
+        nombreDelCli = value;
+      });
     });
   }
 
   Widget _pantallaGrande() {
     double _width = MediaQuery.of(context).size.width;
     return Scaffold(
+      drawer: new Drawer(
+        child: ListView(
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text(widget.pasoDatosGim!.nombre),
+              accountEmail: Text(widget.pasoDatosGim!.ubi),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.black,
+                backgroundImage: NetworkImage(widget.pasoDatosGim!.logo),
+              ),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: NetworkImage(widget.pasoDatosGim!.fondo),
+                    fit: BoxFit.cover),
+              ),
+            ),
+            ListTile(leading: Icon(Icons.person), title: Text('Perfil'))
+          ],
+        ),
+      ),
       appBar: AppBar(
         actions: <Widget>[
-          IconButton(
-              tooltip: 'Cerrar Sesión',
-              icon: Icon(
-                Icons.logout,
+          PopupMenuButton(
+              child: CircleAvatar(
+                backgroundColor: Colors.black45,
+                child: Icon(Icons.person, color: Colors.white),
               ),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed('/');
-              }),
+              itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: TextButton.icon(
+                          onPressed: () {},
+                          label: Text('Mi Perfil'),
+                          icon: Icon(Icons.person)),
+                    ),
+                    PopupMenuItem(
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pushNamed('/');
+                        },
+                        icon: Icon(Icons.logout),
+                        label: Text('Cerrar Sesión'),
+                      ),
+                    ),
+                  ]),
         ],
-        title: Text('Bienvenido ' + useremail),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.pasoDatosGim!.nombre,
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            Text(
+              'Hola ' + nombreDelCli,
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+          ],
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                fit: BoxFit.cover,
+                image: NetworkImage(
+                    'https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/FondoClientes%2Ffondo.jpg?alt=media&token=3f00d050-6966-432b-b164-78ddb6f9ccc8')),
+          ),
+        ),
       ),
       body: Container(
         child: Stack(
           children: <Widget>[
-            SvgPicture.network(
+            SvgPicture.asset(
               'assets/images/wave.svg',
               alignment: Alignment.topCenter,
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
+              fit: BoxFit.cover,
             ),
             Container(
               child: Column(
@@ -59,9 +121,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                       padding: const EdgeInsets.all(20.0),
                       child: GridView(
                         children: [
-                          InkWell(
-                            onTap: () => {},
-                            child: Card(
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -80,193 +143,504 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                   Icon(Icons.person,
                                       size: 40, color: Colors.white),
                                   SizedBox(height: 20, width: 20),
-                                  Text('Clientes', textAlign: TextAlign.center,
+                                  Text('Clientes',
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 20)),
                                 ],
                               ),
                             ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Administrar Clientes"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
                               ),
-                            ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.security,
-                                    size: 40, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Código de Acceso', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20)),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
-                              ),
-                            ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.access_time,
-                                    size: 40, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Turnos', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20)),
-                              ],
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
-                              ),
-                            ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.timelapse,
-                                    size: 40, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Asistencias', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20)),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.security,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Código de Acceso',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
                               ),
                             ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.attach_money_rounded,
-                                    size: 40, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Pagos', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20)),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Administrar Código"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
                               ),
-                            ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.payments,
-                                    size: 40, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Cuotas', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20)),
-                              ],
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.access_time,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Turnos',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
                               ),
                             ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.account_balance_wallet,
-                                    size: 40, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Caja', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20)),
-                              ],
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Cargar Turnos"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Eliminar Turnos"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.timelapse,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Asistencias',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
                               ),
                             ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.notifications,
-                                    size: 40, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Notificaciones', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20)),
-                              ],
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Registrar Asistencias"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Ver Asistencias"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.attach_money_rounded,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Pagos',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
+                              ),
+                            ),
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Registrar Pagos"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Ver Pagos"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.payments,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Cuotas',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
+                              ),
+                            ),
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Administrar Cuotas"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.account_balance_wallet,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Caja',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
+                              ),
+                            ),
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Administrar Caja"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.notifications,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Notificaciones',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
+                              ),
+                            ),
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label:
+                                            Text("Administrar Notificaciones"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: (_width > 750) ? 4 : 3,
-                            mainAxisSpacing: 80,
-                            crossAxisSpacing: 80),
+                            crossAxisCount: (_width > 1000)
+                                ? 4
+                                : (_width > 750)
+                                    ? 3
+                                    : 2,
+                            mainAxisSpacing: (_width > 750)
+                                ? 80
+                                : (_width < 750)
+                                    ? 30
+                                    : 20,
+                            crossAxisSpacing: (_width > 750)
+                                ? 80
+                                : (_width < 750)
+                                    ? 30
+                                    : 20),
                       ),
                     ),
                   ),
@@ -279,7 +653,8 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
     );
   }
 
-  Widget _pantallaChica() {
+  /* Widget _pantallaChica() {
+    double _width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
@@ -312,214 +687,517 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(30.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: GridView(
                         children: [
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
-                              ),
-                            ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.person,
-                                    size: 30, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Clientes', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15)),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.person,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Clientes',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
                               ),
                             ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.security,
-                                    size: 30, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Código de Acceso', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15)),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Administrar Clientes"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
                               ),
-                            ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.access_time,
-                                    size: 30, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Turnos', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15)),
-                              ],
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
-                              ),
-                            ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.timelapse,
-                                    size: 30, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Asistencias', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15)),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.security,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Código de Acceso',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
                               ),
                             ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.attach_money_rounded,
-                                    size: 30, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Pagos', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15)),
-                              ],
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Administrar Código"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
                               ),
-                            ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.payments,
-                                    size: 30, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Cuotas', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15)),
-                              ],
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.access_time,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Turnos',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
                               ),
                             ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.account_balance_wallet,
-                                    size: 30, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Caja', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15)),
-                              ],
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Cargar Turnos"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Eliminar Turnos"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 2.0,
-                                style: BorderStyle.solid,
-                                color: Colors.amber,
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
                               ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.timelapse,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Asistencias',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
                               ),
                             ),
-                            elevation: 10,
-                            color: Colors.black87,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.notifications,
-                                    size: 30, color: Colors.white),
-                                SizedBox(height: 20, width: 20),
-                                Text('Notificaciones', textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15)),
-                              ],
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Registrar Asistencias"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Ver Asistencias"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.attach_money_rounded,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Pagos',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
+                              ),
+                            ),
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Registrar Pagos"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Ver Pagos"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.payments,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Cuotas',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
+                              ),
+                            ),
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Administrar Cuotas"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.account_balance_wallet,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Caja',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
+                              ),
+                            ),
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label: Text("Administrar Caja"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          FlipCard(
+                            direction: FlipDirection.VERTICAL,
+                            fill: Fill.fillBack,
+                            front: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.notifications,
+                                      size: 40, color: Colors.white),
+                                  SizedBox(height: 20, width: 20),
+                                  Text('Notificaciones',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20)),
+                                ],
+                              ),
+                            ),
+                            back: Card(
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 2.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.amber,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              elevation: 10,
+                              color: Colors.black87,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ButtonBar(
+                                    alignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        label:
+                                            Text("Administrar Notificaciones"),
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 50,
-                            crossAxisSpacing: 50),
+                            crossAxisCount: (_width > 750) ? 4 : 3,
+                            mainAxisSpacing: 80,
+                            crossAxisSpacing: 80),
                       ),
                     ),
                   ),
@@ -530,30 +1208,30 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
         ),
       ),
     );
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
-    return Center(
-      child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
-    );
+    //double _width = MediaQuery.of(context).size.width;
+    return Center(child: _pantallaGrande());
   }
 
-  Future<String> obtenerclientes(User user) async {
-    String admin = "";
+  Future<String> obtenerclientes(User user, String nombregym) async {
+    String nombre = "";
     await FirebaseFirestore.instance
-        .collection('clientesPrincipal')
-        .doc('Clientes')
+        .collection('clientesList')
+        .doc('Gimnasios')
+        .collection('Gimnasios')
+        .doc(nombregym)
         .collection('Clientes')
         .get()
         .then((QuerySnapshot query) {
       query.docs.forEach((doc) {
         if (user.email == doc['email']) {
-          admin = doc['admin'];
+          nombre = doc['nombre'];
         }
       });
     });
-    return admin;
+    return nombre;
   }
 }
