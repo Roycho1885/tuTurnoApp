@@ -249,7 +249,7 @@ class _RegistrarState extends State<Registrar> {
         title: Text('Registrar Cliente'),
       ),
       body: Center(
-        child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
+        child: _pantallaGrande()
       ),
     );
   }
@@ -366,7 +366,7 @@ class _RegistrarState extends State<Registrar> {
     final gimdatos = ModalRoute.of(context)!.settings.arguments as Gimnasios;
     return Scrollbar(
       child: Container(
-        padding: EdgeInsets.fromLTRB(200, 5, 200, 5),
+        padding: EdgeInsets.all(20),
         child: Center(
           child: SingleChildScrollView(
             child: Form(
@@ -464,7 +464,7 @@ class _RegistrarState extends State<Registrar> {
     );
   }
 
-  Widget _pantallaChica() {
+  /* Widget _pantallaChica() {
     return Scrollbar(
       child: Container(
         padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
@@ -567,7 +567,7 @@ class _RegistrarState extends State<Registrar> {
         ),
       ),
     );
-  }
+  } */
 }
 
 //METODO REGISTRAR CLIENTE
@@ -618,22 +618,3 @@ class _RegistrarState extends State<Registrar> {
           .showSnackBar(SnackBar(content: Text('Email enviado con éxito')));
     }
   }
-
-/* //COMPRUEBO EL CODIGO DE ACCESO
-Future<bool> comprobarcodigo(
-    String nombrerubro, String codigolocal, String nombrelocal) async {
-  bool verdadero = false;
-  await FirebaseFirestore.instance
-      .collection('clientesList')
-      .doc(nombrerubro)
-      .collection(nombrerubro)
-      .get()
-      .then((QuerySnapshot query) {
-    query.docs.forEach((doc) {
-      if (nombrelocal == doc['nombre'] && codigolocal == doc['codigoacceso']) {
-        verdadero = true;
-      }
-    });
-  });
-  return verdadero;
-} */

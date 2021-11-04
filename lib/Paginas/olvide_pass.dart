@@ -37,13 +37,12 @@ Widget _crearCampoEmail() {
 class _OlvidePassState extends State<OlvidePass> {
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('Recuperar Contraseña'),
       ),
       body: Center(
-        child: (_width > 640) ? _pantallaGrande() : _pantallaChica(),
+        child: _pantallaGrande()
       ),
     );
   }
@@ -51,7 +50,7 @@ class _OlvidePassState extends State<OlvidePass> {
 
 Widget _pantallaGrande() {
   return Container(
-    padding: EdgeInsets.fromLTRB(200, 5, 200, 5),
+    padding: EdgeInsets.all(20),
     child: Center(
       child: SingleChildScrollView(
         child: Form(
@@ -87,7 +86,7 @@ Widget _pantallaGrande() {
   );
 }
 
-Widget _pantallaChica() {
+/* Widget _pantallaChica() {
   return Container(
     padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
     child: Center(
@@ -123,4 +122,4 @@ Widget _pantallaChica() {
       ),
     ),
   );
-}
+} */

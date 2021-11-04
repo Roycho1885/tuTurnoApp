@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flip_card/flip_card.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
+import 'package:tuturnoapp/Widgets/appBar.dart';
+import 'package:tuturnoapp/Widgets/codigoAcceso.dart';
 
 class PrincipalAdmin extends StatefulWidget {
   final Gimnasios? pasoDatosGim;
@@ -47,71 +48,26 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                     fit: BoxFit.cover),
               ),
             ),
-            ListTile(leading: Icon(Icons.person), title: Text('Perfil'))
-          ],
-        ),
-      ),
-      appBar: AppBar(
-        actions: <Widget>[
-          PopupMenuButton(
-              child: CircleAvatar(
-                backgroundColor: Colors.black45,
-                child: Icon(Icons.person, color: Colors.white),
-              ),
-              itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: TextButton.icon(
-                          onPressed: () {},
-                          label: Text('Mi Perfil'),
-                          icon: Icon(Icons.person)),
-                    ),
-                    PopupMenuItem(
-                      child: TextButton.icon(
-                        onPressed: () async {
-                          await FirebaseAuth.instance.signOut();
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pushNamed('/');
-                        },
-                        icon: Icon(Icons.logout),
-                        label: Text('Cerrar Sesión'),
-                      ),
-                    ),
-                  ]),
-        ],
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.pasoDatosGim!.nombre,
-              style: TextStyle(
-                fontSize: 20,
-              ),
+            ListTile(
+              leading: Icon(Icons.email),
+              title: Text('Contacto'),
+              onTap: () {},
             ),
-            Text(
-              'Hola ' + nombreDelCli,
-              style: TextStyle(
-                fontSize: 20,
-              ),
+            ListTile(
+              leading: Icon(Icons.phone_android),
+              title: Text('Acerca de'),
+              onTap: () {},
             ),
           ],
         ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-                fit: BoxFit.cover,
-                image: NetworkImage(
-                    'https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/FondoClientes%2Ffondo.jpg?alt=media&token=3f00d050-6966-432b-b164-78ddb6f9ccc8')),
-          ),
-        ),
       ),
+      appBar: new AppBarGen(nombreDelCli, widget.pasoDatosGim!.nombre),
       body: Container(
         child: Stack(
           children: <Widget>[
             SvgPicture.asset(
               'assets/images/wave.svg',
               alignment: Alignment.topCenter,
-              fit: BoxFit.cover,
             ),
             Container(
               child: Column(
@@ -121,10 +77,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                       padding: const EdgeInsets.all(20.0),
                       child: GridView(
                         children: [
-                          FlipCard(
-                            direction: FlipDirection.VERTICAL,
-                            fill: Fill.fillBack,
-                            front: Card(
+                          InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () {},
+                            child: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -150,40 +106,18 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                 ],
                               ),
                             ),
-                            back: Card(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              elevation: 10,
-                              color: Colors.black87,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Administrar Clientes"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
                           ),
-                          FlipCard(
-                            direction: FlipDirection.VERTICAL,
-                            fill: Fill.fillBack,
-                            front: Card(
+                          InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => CodigoAccesoAdmin(
+                                          pasoDatosGim: widget.pasoDatosGim,
+                                          nombreCli: nombreDelCli,)));
+                            },
+                            child: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -209,40 +143,11 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                 ],
                               ),
                             ),
-                            back: Card(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              elevation: 10,
-                              color: Colors.black87,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Administrar Código"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
                           ),
-                          FlipCard(
-                            direction: FlipDirection.VERTICAL,
-                            fill: Fill.fillBack,
-                            front: Card(
+                          InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () {},
+                            child: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -268,50 +173,11 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                 ],
                               ),
                             ),
-                            back: Card(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              elevation: 10,
-                              color: Colors.black87,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Cargar Turnos"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  ),
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Eliminar Turnos"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
                           ),
-                          FlipCard(
-                            direction: FlipDirection.VERTICAL,
-                            fill: Fill.fillBack,
-                            front: Card(
+                          InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () {},
+                            child: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -337,50 +203,11 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                 ],
                               ),
                             ),
-                            back: Card(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              elevation: 10,
-                              color: Colors.black87,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Registrar Asistencias"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  ),
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Ver Asistencias"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
                           ),
-                          FlipCard(
-                            direction: FlipDirection.VERTICAL,
-                            fill: Fill.fillBack,
-                            front: Card(
+                          InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () {},
+                            child: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -406,50 +233,11 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                 ],
                               ),
                             ),
-                            back: Card(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              elevation: 10,
-                              color: Colors.black87,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Registrar Pagos"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  ),
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Ver Pagos"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
                           ),
-                          FlipCard(
-                            direction: FlipDirection.VERTICAL,
-                            fill: Fill.fillBack,
-                            front: Card(
+                          InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () {},
+                            child: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -475,40 +263,11 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                 ],
                               ),
                             ),
-                            back: Card(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              elevation: 10,
-                              color: Colors.black87,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Administrar Cuotas"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
-                          FlipCard(
-                            direction: FlipDirection.VERTICAL,
-                            fill: Fill.fillBack,
-                            front: Card(
+                          InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () {},
+                            child: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -534,40 +293,11 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                 ],
                               ),
                             ),
-                            back: Card(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              elevation: 10,
-                              color: Colors.black87,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label: Text("Administrar Caja"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
-                          FlipCard(
-                            direction: FlipDirection.VERTICAL,
-                            fill: Fill.fillBack,
-                            front: Card(
+                          InkWell(
+                            splashColor: Colors.amber,
+                            onTap: () {},
+                            child: Card(
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 2.0,
@@ -590,36 +320,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 20)),
-                                ],
-                              ),
-                            ),
-                            back: Card(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                              ),
-                              elevation: 10,
-                              color: Colors.black87,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                        label:
-                                            Text("Administrar Notificaciones"),
-                                        icon: Icon(Icons.chevron_right),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  ),
                                 ],
                               ),
                             ),

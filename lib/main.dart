@@ -9,7 +9,7 @@ import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
-import 'package:tuturnoapp/Widgets/configAdmin.dart';
+import 'package:tuturnoapp/Widgets/codigoAcceso.dart';
 import 'package:tuturnoapp/Widgets/progressDialog.dart';
 import 'Paginas/user_principal.dart';
 import 'package:flutter/services.dart';
@@ -64,7 +64,7 @@ class App extends StatelessWidget {
         '/prinAdmin': (context) => PrincipalAdmin(pasoDatosGim: null,),
         '/registro': (context) => Registrar(),
         '/olvicontra': (context) => OlvidePass(),
-        '/configAdmin': (context) => TabBarAdmin(),
+        '/codigoAccesoAdmin': (context) => CodigoAccesoAdmin(pasoDatosGim: null, nombreCli: '',),
         '/login': (context) => PantallaLogin(),
       },
     );
@@ -738,9 +738,6 @@ class _PantallaLoginState extends State<PantallaLogin> {
   Widget build(BuildContext context) {
     //double _width = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('tu Turno'),
-      ),
       body: Center(child: _pantallaGrande()),
     );
   }
