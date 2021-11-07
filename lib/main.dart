@@ -19,7 +19,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-        statusBarColor: Colors.indigo.shade300,
+        statusBarColor: Colors.black,
         statusBarBrightness: Brightness.dark),
   );
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,15 +56,19 @@ class App extends StatelessWidget {
       title: 'tuTurno',
       theme: ThemeData(
           primarySwatch: Colors.indigo,
-          fontFamily: 'Rubik',
           visualDensity: VisualDensity.adaptivePlatformDensity),
       routes: {
         '/': (context) => PantallaInicial(),
         '/prinUsuario': (context) => PrincipalUsuario(),
-        '/prinAdmin': (context) => PrincipalAdmin(pasoDatosGim: null,),
+        '/prinAdmin': (context) => PrincipalAdmin(
+              pasoDatosGim: null,
+            ),
         '/registro': (context) => Registrar(),
         '/olvicontra': (context) => OlvidePass(),
-        '/codigoAccesoAdmin': (context) => CodigoAccesoAdmin(pasoDatosGim: null, nombreCli: '',),
+        '/codigoAccesoAdmin': (context) => CodigoAccesoAdmin(
+              pasoDatosGim: null,
+              nombreCli: '',
+            ),
         '/login': (context) => PantallaLogin(),
       },
     );

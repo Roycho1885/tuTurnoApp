@@ -16,6 +16,13 @@ class CodigoAccesoAdmin extends StatefulWidget {
 class _CodigoAccesoAdmin extends State<CodigoAccesoAdmin> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   late String _codigo;
+
+  @override
+  void initState() {
+    super.initState();
+    _codigo = widget.pasoDatosGim!.codigoacceso;
+  }
+
   @override
   Widget build(BuildContext context) {
     return _pantalla();
@@ -23,7 +30,10 @@ class _CodigoAccesoAdmin extends State<CodigoAccesoAdmin> {
 
   Widget _pantalla() {
     return Scaffold(
-      appBar: AppBarGen(widget.nombreCli, widget.pasoDatosGim!.nombre),
+      extendBodyBehindAppBar: true,
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80),
+          child: AppBarGen(widget.nombreCli, widget.pasoDatosGim!.nombre)),
       body: Center(
         child: _codigoingreso(),
       ),
@@ -31,59 +41,69 @@ class _CodigoAccesoAdmin extends State<CodigoAccesoAdmin> {
   }
 
   Widget _codigoingreso() {
-    return Form(
-      key: _formkey,
-      child: Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              'Ingrese nuevo código',
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 10),
-            TextFormField(
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Ingrese Código';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                _codigo = value!.trim();
-              },
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              style: TextStyle(fontSize: 18),
-              decoration: InputDecoration(
-                labelText: 'Código',
-                prefixIcon: Icon(Icons.lock),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text('Código Actual'),
-            SizedBox(height: 5),
-            Text(widget.pasoDatosGim!.codigoacceso),
-            SizedBox(height: 50),
-            Container(
-              height: 50,
-              width: 260,
-              child: ElevatedButton(
-                child: Text('Aceptar'),
-                style: OutlinedButton.styleFrom(
-                  shape: StadiumBorder(),
+    return Container(
+      padding: EdgeInsets.only(top: 100, left: 20, right: 20),
+      child: Center(
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formkey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'Ingrese nuevo código',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                onPressed: () {
-                  if (!_formkey.currentState!.validate()) {
-                    return;
-                  }
-                  _formkey.currentState!.save();
-                  registrarCodigo();
-                },
-              ),
+                SizedBox(height: 10),
+                TextFormField(
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Ingrese Código';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _codigo = value!.trim();
+                  },
+                  keyboardType: TextInputType.number,
+                  maxLength: 6,
+                  style: TextStyle(fontSize: 18),
+                  decoration: InputDecoration(
+                    labelText: 'Código',
+                    prefixIcon: Icon(Icons.lock),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Código Actual',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  _codigo,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 50),
+                Container(
+                  height: 50,
+                  width: 260,
+                  child: ElevatedButton(
+                    child: Text('Aceptar'),
+                    style: OutlinedButton.styleFrom(
+                      shape: StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      if (!_formkey.currentState!.validate()) {
+                        return;
+                      }
+                      _formkey.currentState!.save();
+                      registrarCodigo();
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

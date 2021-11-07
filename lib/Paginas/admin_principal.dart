@@ -61,14 +61,14 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
           ],
         ),
       ),
-      appBar: new AppBarGen(nombreDelCli, widget.pasoDatosGim!.nombre),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: new AppBarGen(nombreDelCli, widget.pasoDatosGim!.nombre),
+      ),
+      extendBodyBehindAppBar: true,
       body: Container(
         child: Stack(
           children: <Widget>[
-            SvgPicture.asset(
-              'assets/images/wave.svg',
-              alignment: Alignment.topCenter,
-            ),
             Container(
               child: Column(
                 children: [
@@ -82,11 +82,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                             onTap: () {},
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
@@ -96,8 +91,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.person,
-                                      size: 40, color: Colors.white),
+                                  SvgPicture.asset(
+                                    'assets/images/clientes.svg',
+                                    width: 80,
+                                  ),
                                   SizedBox(height: 20, width: 20),
                                   Text('Clientes',
                                       textAlign: TextAlign.center,
@@ -114,16 +111,12 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (_) => CodigoAccesoAdmin(
-                                          pasoDatosGim: widget.pasoDatosGim,
-                                          nombreCli: nombreDelCli,)));
+                                            pasoDatosGim: widget.pasoDatosGim,
+                                            nombreCli: nombreDelCli,
+                                          )));
                             },
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
@@ -133,8 +126,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.security,
-                                      size: 40, color: Colors.white),
+                                  SvgPicture.asset(
+                                    'assets/images/seguridad.svg',
+                                    width: 80,
+                                  ),
                                   SizedBox(height: 20, width: 20),
                                   Text('Código de Acceso',
                                       textAlign: TextAlign.center,
@@ -149,11 +144,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                             onTap: () {},
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
@@ -163,8 +153,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.access_time,
-                                      size: 40, color: Colors.white),
+                                  SvgPicture.asset(
+                                    'assets/images/turnos.svg',
+                                    width: 80,
+                                  ),
                                   SizedBox(height: 20, width: 20),
                                   Text('Turnos',
                                       textAlign: TextAlign.center,
@@ -179,11 +171,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                             onTap: () {},
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
@@ -193,8 +180,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.timelapse,
-                                      size: 40, color: Colors.white),
+                                  SvgPicture.asset(
+                                    'assets/images/asistencia.svg',
+                                    width: 80,
+                                  ),
                                   SizedBox(height: 20, width: 20),
                                   Text('Asistencias',
                                       textAlign: TextAlign.center,
@@ -209,11 +198,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                             onTap: () {},
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
@@ -223,8 +207,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.attach_money_rounded,
-                                      size: 40, color: Colors.white),
+                                  SvgPicture.asset(
+                                    'assets/images/pagos.svg',
+                                    width: 80,
+                                  ),
                                   SizedBox(height: 20, width: 20),
                                   Text('Pagos',
                                       textAlign: TextAlign.center,
@@ -239,11 +225,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                             onTap: () {},
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
@@ -253,8 +234,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.payments,
-                                      size: 40, color: Colors.white),
+                                  SvgPicture.asset(
+                                    'assets/images/cuotas.svg',
+                                    width: 80,
+                                  ),
                                   SizedBox(height: 20, width: 20),
                                   Text('Cuotas',
                                       textAlign: TextAlign.center,
@@ -269,11 +252,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                             onTap: () {},
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
@@ -283,8 +261,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.account_balance_wallet,
-                                      size: 40, color: Colors.white),
+                                  SvgPicture.asset(
+                                    'assets/images/caja.svg',
+                                    width: 80,
+                                  ),
                                   SizedBox(height: 20, width: 20),
                                   Text('Caja',
                                       textAlign: TextAlign.center,
@@ -299,11 +279,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                             onTap: () {},
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 2.0,
-                                  style: BorderStyle.solid,
-                                  color: Colors.amber,
-                                ),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
@@ -313,8 +288,10 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.notifications,
-                                      size: 40, color: Colors.white),
+                                  SvgPicture.asset(
+                                    'assets/images/notificaciones.svg',
+                                    width: 80,
+                                  ),
                                   SizedBox(height: 20, width: 20),
                                   Text('Notificaciones',
                                       textAlign: TextAlign.center,

@@ -39,12 +39,15 @@ flutter:
   uses-material-design: true
   assets:
       - assets/images/logogristran.png
-      - assets/images/wave.svg
+      - assets/images/clientes.svg
+      - assets/images/seguridad.svg
+      - assets/images/turnos.svg
+      - assets/images/cuotas.svg
+      - assets/images/asistencia.svg
+      - assets/images/pagos.svg
+      - assets/images/caja.svg
+      - assets/images/notificaciones.svg
       - assets/images/logogris.png
       - assets/images/tuturnoicon.png
       - assets/images/fondo.png
       - assets/images/fondo512.png
-  fonts:
-    - family: Rubik
-      fonts:
-        - asset: assets/fonts/Rubik-Regular.ttf
