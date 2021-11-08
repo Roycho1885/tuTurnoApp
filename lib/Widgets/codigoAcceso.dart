@@ -6,6 +6,7 @@ import 'package:tuturnoapp/Widgets/appBar.dart';
 class CodigoAccesoAdmin extends StatefulWidget {
   final Gimnasios? pasoDatosGim;
   final String? nombreCli;
+  //CONSTANTE PARA PASO DE ARGUMENTOS
   const CodigoAccesoAdmin(
       {Key? key, required this.pasoDatosGim, required this.nombreCli})
       : super(key: key);
@@ -14,14 +15,15 @@ class CodigoAccesoAdmin extends StatefulWidget {
 }
 
 class _CodigoAccesoAdmin extends State<CodigoAccesoAdmin> {
+  TextEditingController _controller = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  late String _codigo;
-
-  @override
-  void initState() {
-    super.initState();
-    _codigo = widget.pasoDatosGim!.codigoacceso;
-  }
+  //STREAM PARA USAR EN STREAMBUILDER QUE HACE REFERENCIA A LA BD
+  final Stream<QuerySnapshot> _stream = FirebaseFirestore.instance
+      .collection('clientesList')
+      .doc('Gimnasios')
+      .collection('Gimnasios')
+      .snapshots();
+  late String _codigo = '';
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +58,7 @@ class _CodigoAccesoAdmin extends State<CodigoAccesoAdmin> {
                 ),
                 SizedBox(height: 10),
                 TextFormField(
+                  controller: _controller,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Ingrese Código';
@@ -76,9 +79,28 @@ class _CodigoAccesoAdmin extends State<CodigoAccesoAdmin> {
                 SizedBox(height: 20),
                 Text(
                   'Código Actual',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 SizedBox(height: 5),
+                //STREAMBUILDER PARA REFRESCAR EL CODIGO DE ACCESO CUANDO LO CAMBIA
+                StreamBuilder<QuerySnapshot>(
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      String codigo = '';
+                      if (snapshot.hasError) {
+                        return Text('Algo anda mal...Reintenta');
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      snapshot.data!.docs.forEach((doc) {
+                        if (widget.pasoDatosGim!.nombre == doc['nombre']) {
+                          codigo = doc['codigoacceso'];
+                        }
+                      });
+                      return Text(codigo,
+                          style: TextStyle(fontWeight: FontWeight.bold));
+                    },
+                    stream: _stream),
                 Text(
                   _codigo,
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -97,6 +119,7 @@ class _CodigoAccesoAdmin extends State<CodigoAccesoAdmin> {
                         return;
                       }
                       _formkey.currentState!.save();
+                      _controller.clear();
                       registrarCodigo();
                     },
                   ),

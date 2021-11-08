@@ -889,7 +889,6 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
 
   @override
   Widget build(BuildContext context) {
-    //double _width = MediaQuery.of(context).size.width;
     return Center(child: _pantallaGrande());
   }
 
