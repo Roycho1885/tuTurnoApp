@@ -3,8 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
+import 'package:tuturnoapp/Paginas/clientes.dart';
 import 'package:tuturnoapp/Widgets/appBar.dart';
-import 'package:tuturnoapp/Widgets/codigoAcceso.dart';
+import 'package:tuturnoapp/Paginas/codigoAcceso.dart';
 
 class PrincipalAdmin extends StatefulWidget {
   final Gimnasios? pasoDatosGim;
@@ -79,7 +80,15 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                         children: [
                           InkWell(
                             splashColor: Colors.amber,
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => Clientes(
+                                            pasoDatosGim: widget.pasoDatosGim,
+                                            nombreCli: nombreDelCli,
+                                          )));
+                            },
                             child: Card(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.all(

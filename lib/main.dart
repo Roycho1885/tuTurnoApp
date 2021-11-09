@@ -9,7 +9,7 @@ import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
-import 'package:tuturnoapp/Widgets/codigoAcceso.dart';
+import 'package:tuturnoapp/Paginas/codigoAcceso.dart';
 import 'package:tuturnoapp/Widgets/progressDialog.dart';
 import 'Paginas/user_principal.dart';
 import 'package:flutter/services.dart';
