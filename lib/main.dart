@@ -2,9 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
-import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
@@ -232,13 +230,13 @@ Widget crearListaCard(BuildContext context, DocumentSnapshot document) {
                       Text(
                         gimdatos.nombre,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 20,
                           color: Colors.black87,
                         ),
                       ),
                       Text(
                         gimdatos.ubi,
-                        style: TextStyle(fontSize: 12, color: Colors.black38),
+                        style: TextStyle(fontSize: 15, color: Colors.black38),
                       ),
                     ],
                   )
@@ -480,199 +478,6 @@ class _PantallaLoginState extends State<PantallaLogin> {
     );
   }
 
-  /* Widget _pantallaChica() {
-    final gimdatos = ModalRoute.of(context)!.settings.arguments as Gimnasios;
-    return Container(
-      decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/images/fondo512.png'),
-              fit: BoxFit.cover)),
-      child: Form(
-        key: _formkey,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: ListView(
-            children: [
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.network(
-                    gimdatos.logo,
-                    width: 100,
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: EdgeInsets.all(30),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 5),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 30),
-                        child: TextFormField(
-                          style: TextStyle(fontSize: 15),
-                          enableSuggestions: true,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Ingrese Email';
-                            }
-                            if (!RegExp(
-                                    r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                                .hasMatch(value)) {
-                              return 'Por favor ingrese un email válido';
-                            }
-                            return null;
-                          },
-                          keyboardType: TextInputType.emailAddress,
-                          controller: _controlUsuario,
-                          decoration: InputDecoration(
-                              labelText: 'Email',
-                              prefixIcon: Icon(Icons.email),
-                              suffixIcon: IconButton(
-                                onPressed: _controlUsuario.clear,
-                                icon: Icon(Icons.clear),
-                              )),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 30),
-                        child: TextFormField(
-                          style: TextStyle(fontSize: 15),
-                          validator: (val) =>
-                              val!.isEmpty ? "Ingrese Contraseña" : null,
-                          controller: _controlContra,
-                          obscureText: _ocultar,
-                          decoration: InputDecoration(
-                            labelText: 'Contraseña',
-                            prefixIcon: Icon(Icons.lock),
-                            suffixIcon: IconButton(
-                              onPressed: _toogleboton,
-                              icon: Icon(Icons.visibility_off),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(),
-                            side: BorderSide(color: Colors.white)),
-                        onPressed: () {
-                          //ACA SE INICIA SESION AL USUARIO
-                          if (_formkey.currentState!.validate()) {
-                            showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (BuildContext context) {
-                                  return ProgressDialog(
-                                    mensaje: 'Accediendo...',
-                                  );
-                                });
-                            login(gimdatos.nombre);
-                          }
-                        },
-                        child: Container(
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(15),
-                                    child: Text(
-                                      'Iniciar Sesión',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(20),
-                                    bottomRight: Radius.circular(20))),
-                            side: BorderSide(color: Colors.white)),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Registrar(),
-                                  settings:
-                                      RouteSettings(arguments: gimdatos)));
-                        },
-                        child: Container(
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(15),
-                                    child: Text(
-                                      'Registrarse',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      TextButton(
-                        style: OutlinedButton.styleFrom(
-                          shape: StadiumBorder(),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/olvicontra');
-                        },
-                        child: Text('¿Olvidaste tu contraseña?'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  } */
-
   //FUNCION LOGIN
   void login(Gimnasios datosGim) async {
     try {
@@ -740,7 +545,6 @@ class _PantallaLoginState extends State<PantallaLogin> {
 
   @override
   Widget build(BuildContext context) {
-    //double _width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Center(child: _pantallaGrande()),
     );

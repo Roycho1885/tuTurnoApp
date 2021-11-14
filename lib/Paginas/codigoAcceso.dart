@@ -90,7 +90,7 @@ class _CodigoAccesoAdmin extends State<CodigoAccesoAdmin> {
                         return Text('Algo anda mal...Reintenta');
                       }
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
+                        return CircularProgressIndicator(color: Colors.amber,);
                       }
                       snapshot.data!.docs.forEach((doc) {
                         if (widget.pasoDatosGim!.nombre == doc['nombre']) {

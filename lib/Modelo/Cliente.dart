@@ -1,18 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Cliente {
-  String nombre;
-  String apellido;
-  String dni;
-  String direccion;
-  String telefono;
-  String email;
-  String nombregym;
-  String admin;
-  String token;
-  String ultimopago;
-  String fechavencimiento;
-  int estadopago;
+  String nombre = "";
+  String apellido = "";
+  String dni = "";
+  String direccion = "";
+  String telefono = "";
+  String email = "";
+  String nombregym = "";
+  String admin = "";
+  String token = "";
+  String ultimopago = "";
+  String fechavencimiento = "";
+  int estadopago = 0;
+  DocumentReference? referencia;
 
   Cliente(
       {required this.nombre,
@@ -104,8 +105,25 @@ class Cliente {
   String get getfechavencimiento => this.fechavencimiento;
   int get getestadopago => this.estadopago;
 
+  Cliente.fromMap(Map<String, dynamic> map, {this.referencia}) {
+    nombre = map['nombre'];
+    apellido = map['apellido'];
+    dni = map['dni'];
+    direccion = map['direccion'];
+    telefono = map['telefono'];
+    email = map['email'];
+    nombregym = map['nombregym'];
+    admin = map['admin'];
+    token = map['token'];
+    ultimopago = map['ultimopago'];
+    fechavencimiento = map['fechavencimiento'];
+    estadopago = map['estadopago'];
+  }
+
   Cliente.fromSnapshot(DocumentSnapshot snapshot)
-      : nombre = snapshot["nombre"],
+      : this.fromMap(snapshot.data()! as Map<String, dynamic>,
+            referencia: snapshot
+                .reference); /* nombre = snapshot["nombre"],
         apellido = snapshot["apellido"],
         dni = snapshot["dni"],
         direccion = snapshot["direccion"],
@@ -116,5 +134,5 @@ class Cliente {
         token = snapshot["token"],
         ultimopago = snapshot["ultimopago"],
         fechavencimiento = snapshot["fechavencimiento"],
-        estadopago = snapshot["estadopago"];
+        estadopago = snapshot["estadopago"]; */
 }

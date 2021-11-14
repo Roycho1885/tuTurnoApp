@@ -243,7 +243,6 @@ class _RegistrarState extends State<Registrar> {
 //ACA SE MUESTRAN LOS WIDGETS
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('Registrar Cliente'),
@@ -463,111 +462,6 @@ class _RegistrarState extends State<Registrar> {
       ),
     );
   }
-
-  /* Widget _pantallaChica() {
-    return Scrollbar(
-      child: Container(
-        padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formkey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  _crearCampoNombre(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  _crearCampoApellido(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  _crearCampoDni(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  _crearCampoDireccion(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  _crearCampoTelefono(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  _crearCampoEmail(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  _crearCampoContrasena(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  //_multiplesdropdown(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  _crearCampoCodigo(),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Container(
-                    width: 260,
-                    height: 50,
-                    child: ElevatedButton(
-                      child: Text('Registrar'),
-                      style: OutlinedButton.styleFrom(
-                        shape: StadiumBorder(),
-                      ),
-                      onPressed: () {
-                        if (!_formkey.currentState!.validate()) {
-                          return;
-                        } else {
-                          if (!poli) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text(
-                                    'Debe aceptar las Políticas de Privacidad')));
-                            return;
-                          }
-                        }
-
-                        _formkey.currentState!.save();
-                        /*   comprobarcodigo(d.nombre, _codigo, gselec!.nombre)
-                            .then((value) {
-                          if (value) {
-                            registrar(
-                                _nombre,
-                                _apellido,
-                                _dni,
-                                _direccion,
-                                _telefono,
-                                _email,
-                                _contrasena,
-                                _nombregym = gimd.nombre,
-                                _codigo,
-                                context,
-                                rselec!.nombre);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content:
-                                    Text('El código ingresado no coincide')));
-                          }
-                        }); */
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  crearCheck(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  } */
 }
 
 //METODO REGISTRAR CLIENTE
@@ -587,14 +481,15 @@ class _RegistrarState extends State<Registrar> {
 
       validarcliente(context);
       Navigator.of(context).pushNamed('/');
-      return clinuevo
+      return FirebaseFirestore.instance.runTransaction((transaction) =>
+           clinuevo
           .doc('Gimnasios')
           .collection('Gimnasios')
           .doc(nombregym)
-          .collection("Clientes")
-          .add(clienteNuevo.toJson())
+          .collection("Clientes").doc()
+          .set(clienteNuevo.toJson())
           .then((value) => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Cliente registrado con éxito'))));
+              SnackBar(content: Text('Cliente registrado con éxito')))));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
