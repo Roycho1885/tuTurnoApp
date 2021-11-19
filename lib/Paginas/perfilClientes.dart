@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -20,6 +21,12 @@ class PerfilClientes extends StatefulWidget {
 }
 
 class _PerfilClientes extends State<PerfilClientes> {
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  TextEditingController _controlNombre = TextEditingController();
+  TextEditingController _controlApellido = TextEditingController();
+  TextEditingController _controlDni = TextEditingController();
+  TextEditingController _controlDire = TextEditingController();
+  TextEditingController _controlTele = TextEditingController();
   var mascara = new MaskTextInputFormatter(
       mask: '+54 ###### - ####', filter: {'#': RegExp(r'[0-9]')});
   late String _nombre;
@@ -28,10 +35,15 @@ class _PerfilClientes extends State<PerfilClientes> {
   late String _direccion;
   late String _telefono;
 
-  final double coverHeight = 180;
-  final double perfilHeight = 120;
+  final double perfilHeight = 100;
+
   @override
   Widget build(BuildContext context) {
+    _controlNombre.text = widget.cliente!.nombre;
+    _controlApellido.text = widget.cliente!.apellido;
+    _controlDni.text = widget.cliente!.dni;
+    _controlDire.text = widget.cliente!.direccion;
+    _controlTele.text = widget.cliente!.telefono;
     return Scaffold(
       extendBodyBehindAppBar: false,
       appBar: PreferredSize(
@@ -51,11 +63,12 @@ class _PerfilClientes extends State<PerfilClientes> {
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             elevation: 10,
             child: Form(
+              key: _formkey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: EdgeInsets.only(left: 10, right:10, bottom:10),
+                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
                     child: Column(
                       children: [
                         _crearCampoNombre(),
@@ -65,6 +78,26 @@ class _PerfilClientes extends State<PerfilClientes> {
                         _crearCampoTelefono()
                       ],
                     ),
+                  ),
+                  ButtonBar(
+                    alignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                          onPressed: () {
+                            if (!_formkey.currentState!.validate()) {
+                              return;
+                            } else {
+                              actualizar(
+                                  widget.cliente!,
+                                  _controlNombre.text,
+                                  _controlApellido.text,
+                                  _controlDni.text,
+                                  _controlDire.text,
+                                  _controlTele.text);
+                            }
+                          },
+                          child: Text("Guardar Cambios"))
+                    ],
                   ),
                 ],
               ),
@@ -81,12 +114,12 @@ class _PerfilClientes extends State<PerfilClientes> {
         SizedBox(height: 8),
         Text(
           widget.cliente!.nombre,
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 8),
         Text(
           widget.cliente!.email,
-          style: TextStyle(fontSize: 20, color: Colors.black38),
+          style: TextStyle(fontSize: 16, color: Colors.black38),
         ),
       ],
     );
@@ -114,6 +147,7 @@ class _PerfilClientes extends State<PerfilClientes> {
   //widgets TextField
   Widget _crearCampoNombre() {
     return TextFormField(
+      controller: _controlNombre,
       keyboardType: TextInputType.text,
       decoration:
           InputDecoration(labelText: 'Nombre', prefixIcon: Icon(Icons.person)),
@@ -131,6 +165,7 @@ class _PerfilClientes extends State<PerfilClientes> {
 
   Widget _crearCampoApellido() {
     return TextFormField(
+      controller: _controlApellido,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
           labelText: 'Apellido', prefixIcon: Icon(Icons.person)),
@@ -148,6 +183,7 @@ class _PerfilClientes extends State<PerfilClientes> {
 
   Widget _crearCampoDni() {
     return TextFormField(
+      controller: _controlDni,
       maxLength: 8,
       keyboardType: TextInputType.number,
       inputFormatters: [
@@ -173,6 +209,7 @@ class _PerfilClientes extends State<PerfilClientes> {
 
   Widget _crearCampoDireccion() {
     return TextFormField(
+      controller: _controlDire,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
           labelText: 'Dirección', prefixIcon: Icon(Icons.person)),
@@ -190,6 +227,7 @@ class _PerfilClientes extends State<PerfilClientes> {
 
   Widget _crearCampoTelefono() {
     return TextFormField(
+      controller: _controlTele,
       inputFormatters: [mascara],
       keyboardType: TextInputType.phone,
       decoration: InputDecoration(
@@ -208,5 +246,19 @@ class _PerfilClientes extends State<PerfilClientes> {
         _telefono = value!.trim();
       },
     );
+  }
+
+  actualizar(Cliente cliente, String nombre, String apellido, String dni,
+      String dire, String tele) {
+    FirebaseFirestore.instance.runTransaction((Transaction trans) async {
+      trans.update(cliente.referencia!, {
+        'nombre': nombre,
+        'apellido': apellido,
+        'dni': dni,
+        'direccion': dire,
+        'telefono': tele
+      });
+    }).then((value) => ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Cliente modificado con éxito'))));
   }
 }

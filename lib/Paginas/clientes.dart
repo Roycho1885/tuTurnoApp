@@ -163,7 +163,6 @@ class _Clientes extends State<Clientes> {
                         ),
                       ),
                     ),
-                    onTap: () {},
                   ),
                 );
               });
