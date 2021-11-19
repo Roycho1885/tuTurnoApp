@@ -47,17 +47,25 @@ class _PerfilClientes extends State<PerfilClientes> {
             height: 20,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10))),
             elevation: 10,
-            color: Colors.black38,
             child: Form(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _crearCampoNombre(),
-                  _crearCampoApellido(),
-                  _crearCampoDni(),
-                  _crearCampoDireccion(),
-                  _crearCampoTelefono()
+                  Container(
+                    padding: EdgeInsets.only(left: 10, right:10, bottom:10),
+                    child: Column(
+                      children: [
+                        _crearCampoNombre(),
+                        _crearCampoApellido(),
+                        _crearCampoDni(),
+                        _crearCampoDireccion(),
+                        _crearCampoTelefono()
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
