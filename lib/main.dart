@@ -6,6 +6,7 @@ import 'package:splash_screen_view/SplashScreenView.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
 import 'package:tuturnoapp/Paginas/olvide_pass.dart';
+import 'package:tuturnoapp/Paginas/perfilClientes.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'package:tuturnoapp/Paginas/codigoAcceso.dart';
 import 'package:tuturnoapp/Widgets/progressDialog.dart';
@@ -17,8 +18,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-        statusBarColor: Colors.black,
-        statusBarBrightness: Brightness.dark),
+        statusBarColor: Colors.black, statusBarBrightness: Brightness.dark),
   );
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -68,6 +68,11 @@ class App extends StatelessWidget {
               nombreCli: '',
             ),
         '/login': (context) => PantallaLogin(),
+        '/perfilClientes': (context) => PerfilClientes(
+              cliente: null,
+              pasoDatosGim: null,
+              nombreCli: '',
+            )
       },
     );
   }

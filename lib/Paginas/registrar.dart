@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -93,6 +94,9 @@ class _RegistrarState extends State<Registrar> {
     return TextFormField(
       maxLength: 8,
       keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+      ],
       decoration:
           InputDecoration(labelText: 'DNI', prefixIcon: Icon(Icons.person)),
       validator: (value) {
@@ -204,6 +208,9 @@ class _RegistrarState extends State<Registrar> {
     return TextFormField(
       keyboardType: TextInputType.number,
       maxLength: 6,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+      ],
       decoration:
           InputDecoration(labelText: 'Código', prefixIcon: Icon(Icons.lock)),
       validator: (value) {

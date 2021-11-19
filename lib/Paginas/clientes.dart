@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
+import 'package:tuturnoapp/Paginas/perfilClientes.dart';
+import 'package:tuturnoapp/Widgets/alertDialog.dart';
 import 'package:tuturnoapp/Widgets/appBar.dart';
 
 class Clientes extends StatefulWidget {
@@ -125,7 +127,16 @@ class _Clientes extends State<Clientes> {
                           caption: 'Ver/Modificar',
                           color: Colors.blue,
                           icon: Icons.edit,
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => PerfilClientes(
+                                            cliente: clienteDatos,
+                                            nombreCli: widget.nombreCli,
+                                            pasoDatosGim: widget.pasoDatosGim,
+                                          )));
+                          },
                         ),
                       ],
                       secondaryActions: [
@@ -134,7 +145,7 @@ class _Clientes extends State<Clientes> {
                           color: Colors.red,
                           icon: Icons.delete,
                           onTap: () {
-                            borrarCliente(clienteDatos);
+                            _dialogoAlerta(context, clienteDatos);
                           },
                         ),
                       ],
@@ -163,5 +174,21 @@ class _Clientes extends State<Clientes> {
         ));
       },
     );
+  }
+
+  _dialogoAlerta(BuildContext context, Cliente clidatos) {
+    VoidCallback contCallBack = () => {
+          borrarCliente(clidatos),
+          Navigator.of(context).pop(),
+        };
+
+    AlertaDialogo alerta = AlertaDialogo(
+        "¡Atención!", "Seguro que quieres eliminar este cliente", contCallBack);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alerta;
+        });
   }
 }
