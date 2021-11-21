@@ -46,6 +46,7 @@ flutter:
       - assets/images/asistencia.svg
       - assets/images/pagos.svg
       - assets/images/caja.svg
+      - assets/images/sindatos.svg
       - assets/images/notificaciones.svg
       - assets/images/logogris.png
       - assets/images/tuturnoicon.png

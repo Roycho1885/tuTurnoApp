@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/perfilClientes.dart';
@@ -67,6 +68,7 @@ class _Clientes extends State<Clientes> {
         .collection('Gimnasios')
         .doc(widget.pasoDatosGim!.nombre)
         .collection('Clientes')
+        .where('admin', isEqualTo: 'No')
         .where('apellido', isGreaterThanOrEqualTo: nombreCli)
         .orderBy('apellido')
         .snapshots();
@@ -79,7 +81,7 @@ class _Clientes extends State<Clientes> {
         .collection('Gimnasios')
         .doc(widget.pasoDatosGim!.nombre)
         .collection('Clientes')
-        .orderBy('apellido')
+        .where('admin', isEqualTo: 'No')
         .snapshots();
   }
 
@@ -96,6 +98,7 @@ class _Clientes extends State<Clientes> {
           : getUsuarios(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
+          print(snapshot.error);
           return Text('Algo anda mal...Reintenta');
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -103,6 +106,13 @@ class _Clientes extends State<Clientes> {
             child: CircularProgressIndicator(
               color: Colors.amber,
             ),
+          );
+        }
+        if (snapshot.data!.docs.length == 0) {
+          return Container(
+            padding: EdgeInsets.all(50),
+            alignment: Alignment.center,
+            child: SvgPicture.asset('assets/images/sindatos.svg'),
           );
         }
         if (snapshot.hasData) {
@@ -129,13 +139,13 @@ class _Clientes extends State<Clientes> {
                           icon: Icons.edit,
                           onTap: () {
                             Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => PerfilClientes(
-                                            cliente: clienteDatos,
-                                            nombreCli: widget.nombreCli,
-                                            pasoDatosGim: widget.pasoDatosGim,
-                                          )));
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => PerfilClientes(
+                                          cliente: clienteDatos,
+                                          nombreCli: widget.nombreCli,
+                                          pasoDatosGim: widget.pasoDatosGim,
+                                        )));
                           },
                         ),
                       ],

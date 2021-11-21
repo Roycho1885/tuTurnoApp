@@ -7,7 +7,7 @@ class AlertaDialogo extends StatelessWidget {
   late VoidCallback contCallBack;
 
   AlertaDialogo(this.titulo, this.contenido, this.contCallBack);
-  TextStyle estiloTexto = TextStyle(color: Colors.black);
+  TextStyle estiloTexto = TextStyle(color: Colors.black, fontSize: 15);
   @override
   Widget build(BuildContext context) {
     return BackdropFilter(
