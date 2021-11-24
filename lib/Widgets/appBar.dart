@@ -1,5 +1,10 @@
+import 'dart:html';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 // ignore: must_be_immutable
 class AppBarGen extends AppBar {
@@ -34,7 +39,9 @@ class AppBarGen extends AppBar {
                   itemBuilder: (context) => [
                         PopupMenuItem(
                           child: TextButton.icon(
-                              onPressed: () {},
+                              onPressed: () {
+                                _abrirPopUpPerfilAdmin(context, nombreDelGym);
+                              },
                               label: Text('Mi Perfil'),
                               icon: Icon(Icons.person)),
                         ),
@@ -67,4 +74,70 @@ class AppBarGen extends AppBar {
                   bottomRight: Radius.circular(30),
                   bottomLeft: Radius.circular(30))),
         );
+}
+
+getUsuarios(String nombreGym) {
+  return FirebaseFirestore.instance
+      .collection('clientesList')
+      .doc('Gimnasios')
+      .collection('Gimnasios')
+      .doc(nombreGym)
+      .collection('Clientes')
+      .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+      .snapshots();
+}
+
+_abrirPopUpPerfilAdmin(context, String nombreGim) {
+  Alert(
+      context: context,
+      title: "Mi Perfil",
+      content: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        stream: getUsuarios(nombreGim),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print(snapshot.error);
+            return Text('Algo anda mal...Reintenta');
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: Colors.amber,
+              ),
+            );
+          }
+          if (snapshot.hasData) {
+            var data = snapshot.data!;
+            return Column(
+              children: <Widget>[
+                TextField(
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.account_circle),
+                    labelText: data['nombre'],
+                  ),
+                ),
+                TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.lock),
+                    labelText: 'Password',
+                  ),
+                ),
+              ],
+            );
+          }
+          return Center(
+              child: CircularProgressIndicator(
+            color: Colors.amber,
+          ));
+        },
+      ),
+      buttons: [
+        DialogButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            "LOGIN",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+        )
+      ]).show();
 }
