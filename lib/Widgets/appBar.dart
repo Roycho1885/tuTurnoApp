@@ -1,9 +1,7 @@
-import 'dart:html';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:tuturnoapp/Modelo/Cliente.dart';
@@ -14,6 +12,7 @@ TextEditingController _controlApellido = TextEditingController();
 TextEditingController _controlDni = TextEditingController();
 TextEditingController _controlDire = TextEditingController();
 TextEditingController _controlTele = TextEditingController();
+final color = Colors.indigo;
 var mascara = new MaskTextInputFormatter(
     mask: '+54 ###### - ####', filter: {'#': RegExp(r'[0-9]')});
 late String _nombre;
@@ -129,7 +128,6 @@ _abrirPopUpPerfilAdmin(context, String nombreGim) {
   obtenerclientes(user!, nombreGim).then((value) {
     Alert(
         context: context,
-        title: "Mi Perfil",
         content: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           stream: getUsuarios(nombreGim, value),
           builder: (context, snapshot) {
@@ -154,6 +152,9 @@ _abrirPopUpPerfilAdmin(context, String nombreGim) {
               return Form(
                 child: Column(
                   children: <Widget>[
+                    consTop(),
+                    consContenido(data['nombre'], data['email']),
+                    SizedBox(height: 10),
                     _crearCampoNombre(),
                     _crearCampoApellido(),
                     _crearCampoDni(),
@@ -181,41 +182,68 @@ _abrirPopUpPerfilAdmin(context, String nombreGim) {
   });
 }
 
-/* Widget consContenido() {
-    return Column(
-      children: [
-        SizedBox(height: 8),
-        Text(
-          widget.cliente!.nombre,
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 8),
-        Text(
-          widget.cliente!.email,
-          style: TextStyle(fontSize: 16, color: Colors.black38),
-        ),
-      ],
-    );
-  }
+Widget consContenido(String nombre, String email) {
+  return Column(
+    children: [
+      SizedBox(height: 8),
+      Text(
+        nombre,
+        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 2),
+      Text(
+        email,
+        style: TextStyle(fontSize: 16, color: Colors.black38),
+      ),
+    ],
+  );
+}
 
-  Widget consTop() {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(padding: EdgeInsets.all(30)),
-        Positioned(child: imagenPerfil()),
-      ],
-    );
-  }
+Widget consTop() {
+  return Stack(
+    alignment: Alignment.center,
+    children: [
+      Container(padding: EdgeInsets.all(30)),
+      Positioned(child: imagenPerfil()),
+    ],
+  );
+}
 
-  Widget imagenPerfil() {
-    return CircleAvatar(
-      radius: perfilHeight / 2,
-      backgroundColor: Colors.grey.shade800,
-      backgroundImage: NetworkImage(
-          'https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/LogoClientes%2F1625503819045.png?alt=media&token=7972e01d-f547-4cd0-864a-97702362d353'),
+Widget imagenPerfil() {
+  return Stack(
+    children: [
+      CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.grey.shade800,
+        backgroundImage: NetworkImage(
+            'https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/LogoClientes%2F1625503819045.png?alt=media&token=7972e01d-f547-4cd0-864a-97702362d353'),
+      ),
+      Positioned(
+        bottom: 0,
+        right: 4,
+        child: crearIconoFoto(),
+      ),
+    ],
+  );
+}
+
+Widget crearIconoFoto() {
+  return crearIconoFotoSeg(
+    color: Colors.white,
+    all: 3,
+    child: crearIconoFotoSeg(
+        color: Colors.indigo,
+        all: 8,
+        child: Icon(Icons.edit, size: 15, color: Colors.white)),
+  );
+}
+
+Widget crearIconoFotoSeg(
+        {required Widget child, required double all, required Color color}) =>
+    ClipOval(
+      child: Container(
+          padding: EdgeInsets.all(all), child: child, color: color),
     );
-  } */
 
 //widgets TextField
 Widget _crearCampoNombre() {
