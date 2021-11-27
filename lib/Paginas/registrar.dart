@@ -477,7 +477,7 @@ class _RegistrarState extends State<Registrar> {
     final clienteNuevo = Cliente(nombre: nombre, apellido: apellido, dni: dni, direccion: direccion, 
     telefono: telefono, email: email, nombregym: nombregym, 
     admin: "No", token: "0", ultimopago: "Nunca", 
-    fechavencimiento: "Nunca", estadopago: 0);
+    fechavencimiento: "Nunca", estadopago: 0, imgPerfil: "Vacio");
 
     CollectionReference clinuevo =
         FirebaseFirestore.instance.collection('clientesList');

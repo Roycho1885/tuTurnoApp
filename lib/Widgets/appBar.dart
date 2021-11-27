@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:tuturnoapp/Modelo/Cliente.dart';
@@ -123,6 +126,7 @@ getUsuarios(String nombreGym, String idCli) {
       .snapshots();
 }
 
+//ALERTA DONDE ESTA EL FORM CON LOS DATOS DEL ADMINISTRADOR
 _abrirPopUpPerfilAdmin(context, String nombreGim) {
   final User? user = FirebaseAuth.instance.currentUser;
   obtenerclientes(user!, nombreGim).then((value) {
@@ -152,7 +156,7 @@ _abrirPopUpPerfilAdmin(context, String nombreGim) {
               return Form(
                 child: Column(
                   children: <Widget>[
-                    consTop(),
+                    consTop(data['imgperfil']),
                     consContenido(data['nombre'], data['email']),
                     SizedBox(height: 10),
                     _crearCampoNombre(),
@@ -199,24 +203,24 @@ Widget consContenido(String nombre, String email) {
   );
 }
 
-Widget consTop() {
+Widget consTop(String imgperfil) {
   return Stack(
     alignment: Alignment.center,
     children: [
       Container(padding: EdgeInsets.all(30)),
-      Positioned(child: imagenPerfil()),
+      Positioned(child: imagenPerfil(imgperfil)),
     ],
   );
 }
 
-Widget imagenPerfil() {
+Widget imagenPerfil(String imagen) {
   return Stack(
     children: [
       CircleAvatar(
         radius: 50,
         backgroundColor: Colors.grey.shade800,
         backgroundImage: NetworkImage(
-            'https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/LogoClientes%2F1625503819045.png?alt=media&token=7972e01d-f547-4cd0-864a-97702362d353'),
+            imagen),
       ),
       Positioned(
         bottom: 0,
@@ -232,18 +236,27 @@ Widget crearIconoFoto() {
     color: Colors.white,
     all: 3,
     child: crearIconoFotoSeg(
-        color: Colors.indigo,
-        all: 8,
-        child: Icon(Icons.edit, size: 15, color: Colors.white)),
+      color: Colors.indigo,
+      all: 8,
+      child: InkWell(
+        onTap: (){
+        },
+        child: Icon(
+          Icons.edit, 
+          size: 15, 
+          color: Colors.white),
+      ),
+    ),
   );
 }
 
 Widget crearIconoFotoSeg(
         {required Widget child, required double all, required Color color}) =>
     ClipOval(
-      child: Container(
-          padding: EdgeInsets.all(all), child: child, color: color),
+      child:
+          Container(padding: EdgeInsets.all(all), child: child, color: color),
     );
+
 
 //widgets TextField
 Widget _crearCampoNombre() {

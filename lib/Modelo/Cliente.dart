@@ -13,6 +13,7 @@ class Cliente {
   String ultimopago = "";
   String fechavencimiento = "";
   int estadopago = 0;
+  String imgPerfil = "";
   DocumentReference? referencia;
 
   Cliente(
@@ -27,7 +28,8 @@ class Cliente {
       required this.token,
       required this.ultimopago,
       required this.fechavencimiento,
-      required this.estadopago});
+      required this.estadopago,
+      required this.imgPerfil});
 
   Map<String, dynamic> toJson() => {
         'nombre': nombre,
@@ -42,6 +44,7 @@ class Cliente {
         'ultimopago': ultimopago,
         'fechavencimiento': fechavencimiento,
         'estadopago': estadopago,
+        'imgperfil': imgPerfil,
       };
 
   set setnombre(String nombre) {
@@ -92,6 +95,10 @@ class Cliente {
     this.estadopago = estadopago;
   }
 
+  set setimgperfil(String imgPeril) {
+    this.imgPerfil = imgPeril;
+  }
+
   String get getnombre => this.nombre;
   String get getapellido => this.apellido;
   String get getdni => this.dni;
@@ -104,6 +111,7 @@ class Cliente {
   String get getultimopago => this.ultimopago;
   String get getfechavencimiento => this.fechavencimiento;
   int get getestadopago => this.estadopago;
+  String get getimgperfil => this.imgPerfil;
 
   Cliente.fromMap(Map<String, dynamic> map, {this.referencia}) {
     nombre = map['nombre'];
@@ -118,21 +126,11 @@ class Cliente {
     ultimopago = map['ultimopago'];
     fechavencimiento = map['fechavencimiento'];
     estadopago = map['estadopago'];
+    imgPerfil = map['imgperfil'];
   }
 
   Cliente.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data()! as Map<String, dynamic>,
             referencia: snapshot
-                .reference); /* nombre = snapshot["nombre"],
-        apellido = snapshot["apellido"],
-        dni = snapshot["dni"],
-        direccion = snapshot["direccion"],
-        telefono = snapshot["telefono"],
-        email = snapshot["email"],
-        nombregym = snapshot["nombregym"],
-        admin = snapshot["admin"],
-        token = snapshot["token"],
-        ultimopago = snapshot["ultimopago"],
-        fechavencimiento = snapshot["fechavencimiento"],
-        estadopago = snapshot["estadopago"]; */
+                .reference); 
 }

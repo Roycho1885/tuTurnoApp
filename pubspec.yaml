@@ -24,6 +24,8 @@ dependencies:
   responsive_framework: ^0.1.4
   flutter_slidable: ^0.6.0
   rflutter_alert: ^2.0.4
+  image_picker: ^0.8.4+4
+  firebase_storage: ^10.1.0
   
 
   cupertino_icons: ^1.0.3
