@@ -1,15 +1,9 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:tuturnoapp/Modelo/Cliente.dart';
+import 'package:tuturnoapp/Paginas/perfilAdmin.dart';
 
-final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+/* final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 TextEditingController _controlNombre = TextEditingController();
 TextEditingController _controlApellido = TextEditingController();
 TextEditingController _controlDni = TextEditingController();
@@ -22,7 +16,7 @@ late String _nombre;
 late String _apellido;
 late String _dni;
 late String _direccion;
-late String _telefono;
+late String _telefono; */
 
 // ignore: must_be_immutable
 class AppBarGen extends AppBar {
@@ -58,7 +52,19 @@ class AppBarGen extends AppBar {
                         PopupMenuItem(
                           child: TextButton.icon(
                               onPressed: () {
-                                _abrirPopUpPerfilAdmin(context, nombreDelGym);
+                                User? user = FirebaseAuth.instance.currentUser;
+                                obtenerclientes(user!, nombreDelGym)
+                                    .then((value) =>{
+                                      Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => PerfilAdministrador(
+                                              nombreGym: nombreDelGym,
+                                              nombreCli: nombreDelCli,
+                                              idDoc : value,
+                                            )))
+                                    });
+                                
                               },
                               label: Text('Mi Perfil'),
                               icon: Icon(Icons.person)),
@@ -67,7 +73,6 @@ class AppBarGen extends AppBar {
                           child: TextButton.icon(
                             onPressed: () async {
                               await FirebaseAuth.instance.signOut();
-                              Navigator.of(context).pop();
                               Navigator.of(context).pop();
                               Navigator.of(context).pushNamed('/');
                             },
@@ -114,21 +119,11 @@ Future<String> obtenerclientes(User user, String nombregym) async {
   return idCliente;
 }
 
-//OBTENGO UN SNAPSHOT DEL DOCUMENTO ADMIN LOGEADO CON LOS DATOS
-getUsuarios(String nombreGym, String idCli) {
-  return FirebaseFirestore.instance
-      .collection('clientesList')
-      .doc('Gimnasios')
-      .collection('Gimnasios')
-      .doc(nombreGym)
-      .collection('Clientes')
-      .doc(idCli)
-      .snapshots();
-}
+
+/* 
 
 //ALERTA DONDE ESTA EL FORM CON LOS DATOS DEL ADMINISTRADOR
 _abrirPopUpPerfilAdmin(context, String nombreGim) {
-  final User? user = FirebaseAuth.instance.currentUser;
   obtenerclientes(user!, nombreGim).then((value) {
     Alert(
         context: context,
@@ -184,9 +179,24 @@ _abrirPopUpPerfilAdmin(context, String nombreGim) {
           )
         ]).show();
   });
+} */
+
+/* File? _imagen;
+final _picker = ImagePicker();
+var imgValor;
+Future getImagenDeGaleria() async {
+  final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  final File imagen = File(pickedFile!.path);
+
+  setState(() {
+    _imagen = imagen;
+    print('Imagen direccion $_imagen');
+  });
 }
 
-Widget consContenido(String nombre, String email) {
+*/
+
+/* Widget consContenido(String nombre, String email) {
   return Column(
     children: [
       SizedBox(height: 8),
@@ -219,8 +229,7 @@ Widget imagenPerfil(String imagen) {
       CircleAvatar(
         radius: 50,
         backgroundColor: Colors.grey.shade800,
-        backgroundImage: NetworkImage(
-            imagen),
+        backgroundImage: NetworkImage(imagen),
       ),
       Positioned(
         bottom: 0,
@@ -239,12 +248,9 @@ Widget crearIconoFoto() {
       color: Colors.indigo,
       all: 8,
       child: InkWell(
-        onTap: (){
+        onTap: () {
         },
-        child: Icon(
-          Icons.edit, 
-          size: 15, 
-          color: Colors.white),
+        child: Icon(Icons.edit, size: 15, color: Colors.white),
       ),
     ),
   );
@@ -256,108 +262,4 @@ Widget crearIconoFotoSeg(
       child:
           Container(padding: EdgeInsets.all(all), child: child, color: color),
     );
-
-
-//widgets TextField
-Widget _crearCampoNombre() {
-  return TextFormField(
-    controller: _controlNombre,
-    keyboardType: TextInputType.text,
-    decoration:
-        InputDecoration(labelText: 'Nombre', prefixIcon: Icon(Icons.person)),
-    validator: (value) {
-      if (value!.isEmpty) {
-        return 'Ingrese Nombre';
-      }
-      return null;
-    },
-    onSaved: (value) {
-      _nombre = value!.trim();
-    },
-  );
-}
-
-Widget _crearCampoApellido() {
-  return TextFormField(
-    controller: _controlApellido,
-    keyboardType: TextInputType.text,
-    decoration:
-        InputDecoration(labelText: 'Apellido', prefixIcon: Icon(Icons.person)),
-    validator: (value) {
-      if (value!.isEmpty) {
-        return 'Ingrese Apellido';
-      }
-      return null;
-    },
-    onSaved: (value) {
-      _apellido = value!.trim();
-    },
-  );
-}
-
-Widget _crearCampoDni() {
-  return TextFormField(
-    controller: _controlDni,
-    maxLength: 8,
-    keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-    ],
-    decoration:
-        InputDecoration(labelText: 'DNI', prefixIcon: Icon(Icons.person)),
-    validator: (value) {
-      if (value!.isEmpty) {
-        return 'Ingrese DNI';
-      } else {
-        if (value.length != 8) {
-          return "Ingrese DNI completo";
-        }
-      }
-      return null;
-    },
-    onSaved: (value) {
-      _dni = value!.trim();
-    },
-  );
-}
-
-Widget _crearCampoDireccion() {
-  return TextFormField(
-    controller: _controlDire,
-    keyboardType: TextInputType.text,
-    decoration:
-        InputDecoration(labelText: 'Dirección', prefixIcon: Icon(Icons.person)),
-    validator: (value) {
-      if (value!.isEmpty) {
-        return 'Ingrese Dirección';
-      }
-      return null;
-    },
-    onSaved: (value) {
-      _direccion = value!.trim();
-    },
-  );
-}
-
-Widget _crearCampoTelefono() {
-  return TextFormField(
-    controller: _controlTele,
-    inputFormatters: [mascara],
-    keyboardType: TextInputType.phone,
-    decoration:
-        InputDecoration(labelText: 'Teléfono', prefixIcon: Icon(Icons.person)),
-    validator: (value) {
-      if (value!.isEmpty) {
-        return 'Ingrese Teléfono';
-      } else {
-        if (value.length != 17) {
-          return "Ingrese el número completo";
-        }
-      }
-      return null;
-    },
-    onSaved: (value) {
-      _telefono = value!.trim();
-    },
-  );
-}
+ */

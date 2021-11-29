@@ -10,6 +10,7 @@ import 'package:tuturnoapp/Paginas/perfilClientes.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'package:tuturnoapp/Paginas/codigoAcceso.dart';
 import 'package:tuturnoapp/Widgets/progressDialog.dart';
+import 'Paginas/perfilAdmin.dart';
 import 'Paginas/user_principal.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -72,7 +73,12 @@ class App extends StatelessWidget {
               cliente: null,
               pasoDatosGim: null,
               nombreCli: '',
-            )
+            ),
+            '/perfilAdmin': (context) => PerfilAdministrador(
+              nombreGym:'',
+              nombreCli: '',
+              idDoc: ''
+            ) 
       },
     );
   }
