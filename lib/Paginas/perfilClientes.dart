@@ -137,11 +137,11 @@ class _PerfilClientes extends State<PerfilClientes> {
 
   Widget imagenPerfil() {
     return CircleAvatar(
-      radius: perfilHeight / 2,
-      backgroundColor: Colors.grey.shade800,
-      backgroundImage: NetworkImage(
-          'https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/LogoClientes%2F1625503819045.png?alt=media&token=7972e01d-f547-4cd0-864a-97702362d353'),
-    );
+        radius: perfilHeight / 2,
+        backgroundColor: Colors.black,
+        child: (widget.cliente!.imgPerfil != "Vacio")
+            ? Image.network(widget.cliente!.imgPerfil)
+            : Image.network(widget.pasoDatosGim!.logo));
   }
 
   //widgets TextField

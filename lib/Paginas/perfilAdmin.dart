@@ -1,13 +1,13 @@
-import 'dart:io' as io; 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:tuturnoapp/Widgets/appBar.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as Path;
 
 class PerfilAdministrador extends StatefulWidget {
   final String? nombreGym;
@@ -24,7 +24,8 @@ class PerfilAdministrador extends StatefulWidget {
 }
 
 class _PerfilAdministrador extends State<PerfilAdministrador> {
-  late io.File _imagen;
+  XFile? _imagen;
+  String? _urlFoto;
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController _controlNombre = TextEditingController();
   TextEditingController _controlApellido = TextEditingController();
@@ -43,14 +44,34 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
   @override
   Widget build(BuildContext context) {
     Future getImagen() async {
-      var imagen = await ImagePicker().pickImage(source: ImageSource.gallery);
+      XFile? imagen =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+
       setState(() {
-        _imagen = imagen as io.File;
-        print('Imagen direccion $_imagen');
+        _imagen = imagen;
       });
     }
 
-    Future subirImgPerfil(BuildContext contexto) async {
+    Future subirImgPerfil() async {
+      if (kIsWeb) {
+        firebase_storage.Reference storage = firebase_storage
+            .FirebaseStorage.instance
+            .ref()
+            .child('imagenesClientes/${Path.basename(_imagen!.path)}');
+        await storage
+            .putData(await _imagen!.readAsBytes(),
+                firebase_storage.SettableMetadata(contentType: 'image/jpg'))
+            .whenComplete(
+                () async => await storage.getDownloadURL().then((value) => {
+                      setState(() {
+                        _urlFoto = value;
+                      })
+                    }));
+      }
+      return _urlFoto;
+    }
+
+    /* Future subirImgPerfil(BuildContext contexto) async {
       String fileNombre = basename(_imagen.path);
       firebase_storage.Reference storage =
           firebase_storage.FirebaseStorage.instance.ref().child(fileNombre);
@@ -60,7 +81,7 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
                 ScaffoldMessenger.of(contexto).showSnackBar(
                     SnackBar(content: Text('Imagen subida con éxito')))
               });
-    }
+    } */
 
     return Scaffold(
       extendBodyBehindAppBar: false,
@@ -128,14 +149,16 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
                                       if (!_formkey.currentState!.validate()) {
                                         return;
                                       } else {
-                                        subirImgPerfil(context);
-                                        actualizar(
-                                            datosCliente,
-                                            _controlNombre.text,
-                                            _controlApellido.text,
-                                            _controlDni.text,
-                                            _controlDire.text,
-                                            _controlTele.text);
+                                        subirImgPerfil().then((value) => {
+                                              actualizar(
+                                                  datosCliente,
+                                                  _controlNombre.text,
+                                                  _controlApellido.text,
+                                                  _controlDni.text,
+                                                  _controlDire.text,
+                                                  _controlTele.text,
+                                                  value),
+                                            });
                                       }
                                     },
                                     child: Text("Guardar Cambios"))
@@ -202,7 +225,7 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
     return Stack(
       children: [
         CircleAvatar(
-          radius: 50,
+          radius: 60,
           backgroundColor: Colors.grey.shade800,
           backgroundImage: NetworkImage(imagen, scale: 1),
         ),
@@ -221,7 +244,7 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
       all: 3,
       child: crearIconoFotoSeg(
         color: Colors.indigo,
-        all: 8,
+        all: 10,
         child: InkWell(
           onTap: () {
             getImagen();
@@ -344,15 +367,18 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
   }
 
   actualizar(Cliente cliente, String nombre, String apellido, String dni,
-      String dire, String tele) {
+      String dire, String tele, String? imgUrl) {
     FirebaseFirestore.instance.runTransaction((Transaction trans) async {
       trans.update(cliente.referencia!, {
         'nombre': nombre,
         'apellido': apellido,
         'dni': dni,
         'direccion': dire,
-        'telefono': tele
+        'telefono': tele,
+        'imgperfil': imgUrl,
       });
-    }).then((value) => ScaffoldMessenger(child: SnackBar(content: Text('Datos actualizado correctamente'),)));
+    }).then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Datos Modificados con éxito'),
+        )));
   }
 }
