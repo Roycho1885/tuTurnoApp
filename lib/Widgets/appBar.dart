@@ -55,6 +55,7 @@ class AppBarGen extends AppBar {
                                 User? user = FirebaseAuth.instance.currentUser;
                                 obtenerclientes(user!, nombreDelGym)
                                     .then((value) =>{
+                                      Navigator.of(context).pop(),
                                       Navigator.push(
                                     context,
                                     MaterialPageRoute(

@@ -1,8 +1,13 @@
+import 'dart:io' as io; 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:tuturnoapp/Modelo/Cliente.dart';
 import 'package:tuturnoapp/Widgets/appBar.dart';
+import 'package:path/path.dart';
 
 class PerfilAdministrador extends StatefulWidget {
   final String? nombreGym;
@@ -19,6 +24,7 @@ class PerfilAdministrador extends StatefulWidget {
 }
 
 class _PerfilAdministrador extends State<PerfilAdministrador> {
+  late io.File _imagen;
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController _controlNombre = TextEditingController();
   TextEditingController _controlApellido = TextEditingController();
@@ -36,6 +42,26 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
 
   @override
   Widget build(BuildContext context) {
+    Future getImagen() async {
+      var imagen = await ImagePicker().pickImage(source: ImageSource.gallery);
+      setState(() {
+        _imagen = imagen as io.File;
+        print('Imagen direccion $_imagen');
+      });
+    }
+
+    Future subirImgPerfil(BuildContext contexto) async {
+      String fileNombre = basename(_imagen.path);
+      firebase_storage.Reference storage =
+          firebase_storage.FirebaseStorage.instance.ref().child(fileNombre);
+      firebase_storage.UploadTask upload = storage.putFile(_imagen);
+      firebase_storage.TaskSnapshot taskSnapshot =
+          await upload.whenComplete(() => {
+                ScaffoldMessenger.of(contexto).showSnackBar(
+                    SnackBar(content: Text('Imagen subida con éxito')))
+              });
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: false,
       appBar: PreferredSize(
@@ -61,24 +87,65 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
               }
               if (snapshot.hasData) {
                 var data = snapshot.data!;
+                final datosCliente = Cliente.fromSnapshot(data);
                 _controlNombre.text = data['nombre'];
                 _controlApellido.text = data['apellido'];
                 _controlDni.text = data['dni'];
                 _controlDire.text = data['direccion'];
                 _controlTele.text = data['telefono'];
-                return Form(
-                  child: Column(
-                    children: <Widget>[
-                      consTop(data['imgperfil']),
-                      consContenido(data['nombre'], data['email']),
-                      SizedBox(height: 10),
-                      _crearCampoNombre(),
-                      _crearCampoApellido(),
-                      _crearCampoDni(),
-                      _crearCampoDireccion(),
-                      _crearCampoTelefono()
-                    ],
-                  ),
+                return Column(
+                  children: <Widget>[
+                    consTop(data['imgperfil'], getImagen),
+                    consContenido(data['nombre'], data['email']),
+                    SizedBox(height: 10),
+                    Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      elevation: 10,
+                      child: Form(
+                        key: _formkey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(
+                                  left: 10, right: 10, bottom: 10),
+                              child: Column(
+                                children: [
+                                  _crearCampoNombre(),
+                                  _crearCampoApellido(),
+                                  _crearCampoDni(),
+                                  _crearCampoDireccion(),
+                                  _crearCampoTelefono()
+                                ],
+                              ),
+                            ),
+                            ButtonBar(
+                              alignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                    onPressed: () {
+                                      if (!_formkey.currentState!.validate()) {
+                                        return;
+                                      } else {
+                                        subirImgPerfil(context);
+                                        actualizar(
+                                            datosCliente,
+                                            _controlNombre.text,
+                                            _controlApellido.text,
+                                            _controlDni.text,
+                                            _controlDire.text,
+                                            _controlTele.text);
+                                      }
+                                    },
+                                    child: Text("Guardar Cambios"))
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               }
               return Center(
@@ -121,17 +188,17 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
     );
   }
 
-  Widget consTop(String imgperfil) {
+  Widget consTop(String imgperfil, Future getImagen()) {
     return Stack(
       alignment: Alignment.center,
       children: [
         Container(padding: EdgeInsets.all(30)),
-        Positioned(child: imagenPerfil(imgperfil)),
+        Positioned(child: imagenPerfil(imgperfil, getImagen)),
       ],
     );
   }
 
-  Widget imagenPerfil(String imagen) {
+  Widget imagenPerfil(String imagen, Future getImagen()) {
     return Stack(
       children: [
         CircleAvatar(
@@ -142,13 +209,13 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
         Positioned(
           bottom: 0,
           right: 4,
-          child: crearIconoFoto(),
+          child: crearIconoFoto(getImagen),
         ),
       ],
     );
   }
 
-  Widget crearIconoFoto() {
+  Widget crearIconoFoto(Future getImagen()) {
     return crearIconoFotoSeg(
       color: Colors.white,
       all: 3,
@@ -156,7 +223,9 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
         color: Colors.indigo,
         all: 8,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            getImagen();
+          },
           child: Icon(Icons.edit, size: 15, color: Colors.white),
         ),
       ),
@@ -272,5 +341,18 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
         _telefono = value!.trim();
       },
     );
+  }
+
+  actualizar(Cliente cliente, String nombre, String apellido, String dni,
+      String dire, String tele) {
+    FirebaseFirestore.instance.runTransaction((Transaction trans) async {
+      trans.update(cliente.referencia!, {
+        'nombre': nombre,
+        'apellido': apellido,
+        'dni': dni,
+        'direccion': dire,
+        'telefono': tele
+      });
+    }).then((value) => ScaffoldMessenger(child: SnackBar(content: Text('Datos actualizado correctamente'),)));
   }
 }
