@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
@@ -25,7 +26,8 @@ class PerfilAdministrador extends StatefulWidget {
 
 class _PerfilAdministrador extends State<PerfilAdministrador> {
   XFile? _imagen;
-  String? _urlFoto;
+  String? _urlFotoWeb, _urlFotoAndroid;
+  File? _foto;
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController _controlNombre = TextEditingController();
   TextEditingController _controlApellido = TextEditingController();
@@ -53,35 +55,36 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
     }
 
     Future subirImgPerfil() async {
+      bool bandera = false;
       if (kIsWeb) {
+        bandera = true;
         firebase_storage.Reference storage = firebase_storage
             .FirebaseStorage.instance
             .ref()
-            .child('imagenesClientes/${Path.basename(_imagen!.path)}');
+            .child('imagenesClientes/${widget.nombreCli}/${Path.basename(_imagen!.path)}');
         await storage
             .putData(await _imagen!.readAsBytes(),
                 firebase_storage.SettableMetadata(contentType: 'image/jpg'))
             .whenComplete(
                 () async => await storage.getDownloadURL().then((value) => {
                       setState(() {
-                        _urlFoto = value;
+                        _urlFotoWeb = value;
                       })
                     }));
+      } else {
+          firebase_storage.Reference storage =
+              firebase_storage.FirebaseStorage.instance.ref().child('imagenesClientes/${widget.nombreCli}/${Path.basename(_imagen!.path)}');
+          _foto = File(_imagen!.path);
+          firebase_storage.UploadTask upload = storage.putFile(_foto!);
+              await upload.whenComplete(() async => await storage.getDownloadURL().then((value) => {
+                      setState(() {
+                        _urlFotoAndroid = value;
+                      })
+                    }));
+        
       }
-      return _urlFoto;
+      return bandera? _urlFotoWeb : _urlFotoAndroid;
     }
-
-    /* Future subirImgPerfil(BuildContext contexto) async {
-      String fileNombre = basename(_imagen.path);
-      firebase_storage.Reference storage =
-          firebase_storage.FirebaseStorage.instance.ref().child(fileNombre);
-      firebase_storage.UploadTask upload = storage.putFile(_imagen);
-      firebase_storage.TaskSnapshot taskSnapshot =
-          await upload.whenComplete(() => {
-                ScaffoldMessenger.of(contexto).showSnackBar(
-                    SnackBar(content: Text('Imagen subida con éxito')))
-              });
-    } */
 
     return Scaffold(
       extendBodyBehindAppBar: false,
@@ -228,6 +231,7 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
           radius: 60,
           backgroundColor: Colors.grey.shade800,
           backgroundImage: NetworkImage(imagen, scale: 1),
+          //child: (foto != null)?Image.file(foto!,fit: BoxFit.fill,) : Image.network('https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/LogoClientes%2Flogogristran.png?alt=media&token=f05666bc-bea4-4930-9769-50c58c4c2c1c')
         ),
         Positioned(
           bottom: 0,
