@@ -48,9 +48,11 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
     Future getImagen() async {
       XFile? imagen =
           await ImagePicker().pickImage(source: ImageSource.gallery);
+          File foto = File(imagen!.path);
 
       setState(() {
         _imagen = imagen;
+        _foto = foto;
       });
     }
 
@@ -230,8 +232,8 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
         CircleAvatar(
           radius: 60,
           backgroundColor: Colors.grey.shade800,
-          backgroundImage: NetworkImage(imagen, scale: 1),
-          //child: (foto != null)?Image.file(foto!,fit: BoxFit.fill,) : Image.network('https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/LogoClientes%2Flogogristran.png?alt=media&token=f05666bc-bea4-4930-9769-50c58c4c2c1c')
+          //backgroundImage: NetworkImage(imagen, scale: 1),
+          child: (_foto != null)?Image.file(_foto!,fit: BoxFit.fill,) : Image.network('https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/LogoClientes%2Flogogristran.png?alt=media&token=f05666bc-bea4-4930-9769-50c58c4c2c1c')
         ),
         Positioned(
           bottom: 0,
