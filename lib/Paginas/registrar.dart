@@ -27,6 +27,7 @@ class _RegistrarState extends State<Registrar> {
   late String _contrasena;
   late String _codigo;
   late String _nombregym;
+  late String _imgperfil;
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
@@ -254,9 +255,7 @@ class _RegistrarState extends State<Registrar> {
       appBar: AppBar(
         title: Text('Registrar Cliente'),
       ),
-      body: Center(
-        child: _pantallaGrande()
-      ),
+      body: Center(child: _pantallaGrande()),
     );
   }
   //----------------------------------------------
@@ -448,7 +447,8 @@ class _RegistrarState extends State<Registrar> {
                               _contrasena,
                               _nombregym = gimdatos.nombre,
                               _codigo,
-                              context);
+                              context,
+                              _imgperfil = gimdatos.logo);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content:
@@ -472,51 +472,60 @@ class _RegistrarState extends State<Registrar> {
 }
 
 //METODO REGISTRAR CLIENTE
-  Future<void> registrar(nombre, apellido, dni, direccion, telefono, email,
-      contrasena, nombregym, codigo, context) async {
-    final clienteNuevo = Cliente(nombre: nombre, apellido: apellido, dni: dni, direccion: direccion, 
-    telefono: telefono, email: email, nombregym: nombregym, 
-    admin: "No", token: "0", ultimopago: "Nunca", 
-    fechavencimiento: "Nunca", estadopago: 0, imgPerfil: "Vacio");
+Future<void> registrar(nombre, apellido, dni, direccion, telefono, email,
+    contrasena, nombregym, codigo, context, imgperfil) async {
+  final clienteNuevo = Cliente(
+      nombre: nombre,
+      apellido: apellido,
+      dni: dni,
+      direccion: direccion,
+      telefono: telefono,
+      email: email,
+      nombregym: nombregym,
+      admin: "No",
+      token: "0",
+      ultimopago: "Nunca",
+      fechavencimiento: "Nunca",
+      estadopago: 0,
+      imgPerfil: imgperfil);
 
-    CollectionReference clinuevo =
-        FirebaseFirestore.instance.collection('clientesList');
+  CollectionReference clinuevo =
+      FirebaseFirestore.instance.collection('clientesList');
 
-    try {
-      UserCredential userCreden = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: contrasena);
+  try {
+    UserCredential userCreden = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: contrasena);
 
-      validarcliente(context);
-      Navigator.of(context).pushNamed('/');
-      return FirebaseFirestore.instance.runTransaction((transaction) =>
-           clinuevo
-          .doc('Gimnasios')
-          .collection('Gimnasios')
-          .doc(nombregym)
-          .collection("Clientes").doc()
-          .set(clienteNuevo.toJson())
-          .then((value) => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Cliente registrado con éxito')))));
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text('La contraseña debe contener al menos 6 caracteres')));
-      } else {
-        if (e.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Email utilizado en una cuenta existente')));
-        }
+    validarcliente(context);
+    Navigator.of(context).pushNamed('/');
+    return FirebaseFirestore.instance.runTransaction((transaction) => clinuevo
+        .doc('Gimnasios')
+        .collection('Gimnasios')
+        .doc(nombregym)
+        .collection("Clientes")
+        .doc()
+        .set(clienteNuevo.toJson())
+        .then((value) => ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Cliente registrado con éxito')))));
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'weak-password') {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('La contraseña debe contener al menos 6 caracteres')));
+    } else {
+      if (e.code == 'email-already-in-use') {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Email utilizado en una cuenta existente')));
       }
-    } catch (e) {}
-  }
+    }
+  } catch (e) {}
+}
 
 //ENVIO DE VALIDACION CLIENTE
-  Future<void> validarcliente(context) async {
-    User? clienteEmail = FirebaseAuth.instance.currentUser;
-    if (!clienteEmail!.emailVerified) {
-      await clienteEmail.sendEmailVerification();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Email enviado con éxito')));
-    }
+Future<void> validarcliente(context) async {
+  User? clienteEmail = FirebaseAuth.instance.currentUser;
+  if (!clienteEmail!.emailVerified) {
+    await clienteEmail.sendEmailVerification();
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Email enviado con éxito')));
   }
+}

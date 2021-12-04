@@ -137,11 +137,15 @@ class _PerfilClientes extends State<PerfilClientes> {
 
   Widget imagenPerfil() {
     return CircleAvatar(
-        radius: perfilHeight / 2,
-        backgroundColor: Colors.black,
-        child: (widget.cliente!.imgPerfil != "Vacio")
-            ? Image.network(widget.cliente!.imgPerfil)
-            : Image.network(widget.pasoDatosGim!.logo));
+      radius: 60,
+      backgroundColor: Colors.black,
+      child: ClipOval(
+        child: SizedBox(
+            width: 120,
+            height: 120,
+            child: Image.network(widget.cliente!.imgPerfil, fit: BoxFit.fill)),
+      ),
+    );
   }
 
   //widgets TextField

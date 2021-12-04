@@ -162,9 +162,9 @@ class _Clientes extends State<Clientes> {
                       child: ListTile(
                         leading: CircleAvatar(
                             backgroundColor: Colors.black,
-                            child: (data['imgperfil'].toString() != "Vacio")
-                                ? Image.network(data['imgperfil'])
-                                : Image.network(widget.pasoDatosGim!.logo)),
+                            child: ClipOval(
+                                child: Image.network(data['imgperfil'], fit: BoxFit.fill),
+                            )),
                         title: Text(
                           data['apellido'] + ' ' + data['nombre'],
                           style: TextStyle(fontSize: 18),

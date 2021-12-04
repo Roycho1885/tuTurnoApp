@@ -48,11 +48,9 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
     Future getImagen() async {
       XFile? imagen =
           await ImagePicker().pickImage(source: ImageSource.gallery);
-          File foto = File(imagen!.path);
 
       setState(() {
         _imagen = imagen;
-        _foto = foto;
       });
     }
 
@@ -60,10 +58,9 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
       bool bandera = false;
       if (kIsWeb) {
         bandera = true;
-        firebase_storage.Reference storage = firebase_storage
-            .FirebaseStorage.instance
-            .ref()
-            .child('imagenesClientes/${widget.nombreCli}/${Path.basename(_imagen!.path)}');
+        firebase_storage.Reference storage =
+            firebase_storage.FirebaseStorage.instance.ref().child(
+                'imagenesClientes/${widget.nombreCli}/${Path.basename(_imagen!.path)}');
         await storage
             .putData(await _imagen!.readAsBytes(),
                 firebase_storage.SettableMetadata(contentType: 'image/jpg'))
@@ -74,18 +71,19 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
                       })
                     }));
       } else {
-          firebase_storage.Reference storage =
-              firebase_storage.FirebaseStorage.instance.ref().child('imagenesClientes/${widget.nombreCli}/${Path.basename(_imagen!.path)}');
-          _foto = File(_imagen!.path);
-          firebase_storage.UploadTask upload = storage.putFile(_foto!);
-              await upload.whenComplete(() async => await storage.getDownloadURL().then((value) => {
-                      setState(() {
-                        _urlFotoAndroid = value;
-                      })
-                    }));
-        
+        firebase_storage.Reference storage =
+            firebase_storage.FirebaseStorage.instance.ref().child(
+                'imagenesClientes/${widget.nombreCli}/${Path.basename(_imagen!.path)}');
+        _foto = File(_imagen!.path);
+        firebase_storage.UploadTask upload = storage.putFile(_foto!);
+        await upload.whenComplete(
+            () async => await storage.getDownloadURL().then((value) => {
+                  setState(() {
+                    _urlFotoAndroid = value;
+                  })
+                }));
       }
-      return bandera? _urlFotoWeb : _urlFotoAndroid;
+      return bandera ? _urlFotoWeb : _urlFotoAndroid;
     }
 
     return Scaffold(
@@ -221,19 +219,52 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
       alignment: Alignment.center,
       children: [
         Container(padding: EdgeInsets.all(30)),
-        Positioned(child: imagenPerfil(imgperfil, getImagen)),
+        Positioned(
+            child: (kIsWeb)
+                ? imagenPerfilWeb(imgperfil, getImagen)
+                : imagenPerfilAndroid(imgperfil, getImagen)),
       ],
     );
   }
 
-  Widget imagenPerfil(String imagen, Future getImagen()) {
+  Widget imagenPerfilWeb(String imagen, Future getImagen()) {
     return Stack(
       children: [
         CircleAvatar(
           radius: 60,
           backgroundColor: Colors.grey.shade800,
-          //backgroundImage: NetworkImage(imagen, scale: 1),
-          child: (_foto != null)?Image.file(_foto!,fit: BoxFit.fill,) : Image.network('https://firebasestorage.googleapis.com/v0/b/tuturno-91997.appspot.com/o/LogoClientes%2Flogogristran.png?alt=media&token=f05666bc-bea4-4930-9769-50c58c4c2c1c')
+          child: ClipOval(
+            child: SizedBox(
+                width: 120,
+                height: 120,
+                child: (_imagen != null)
+                    ? Image.network(_imagen!.path, fit: BoxFit.fill)
+                    : Image.network(imagen, fit: BoxFit.fill, scale: 1)),
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          right: 4,
+          child: crearIconoFoto(getImagen),
+        ),
+      ],
+    );
+  }
+
+  Widget imagenPerfilAndroid(String imagen, Future getImagen()) {
+    return Stack(
+      children: [
+        CircleAvatar(
+          radius: 60,
+          backgroundColor: Colors.black,
+          child: ClipOval(
+            child: SizedBox(
+                width: 120,
+                height: 120,
+                child: (_imagen != null)
+                    ? Image.file(File(_imagen!.path), fit: BoxFit.fill)
+                    : Image.network(imagen, fit: BoxFit.fill, scale: 1)),
+          ),
         ),
         Positioned(
           bottom: 0,
@@ -248,13 +279,13 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
     return crearIconoFotoSeg(
       color: Colors.white,
       all: 3,
-      child: crearIconoFotoSeg(
-        color: Colors.indigo,
-        all: 10,
-        child: InkWell(
-          onTap: () {
-            getImagen();
-          },
+      child: InkWell(
+        onTap: () {
+          getImagen();
+        },
+        child: crearIconoFotoSeg(
+          color: Colors.indigo,
+          all: 10,
           child: Icon(Icons.edit, size: 15, color: Colors.white),
         ),
       ),
