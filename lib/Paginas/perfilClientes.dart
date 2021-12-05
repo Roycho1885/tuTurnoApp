@@ -44,66 +44,68 @@ class _PerfilClientes extends State<PerfilClientes> {
     _controlDni.text = widget.cliente!.dni;
     _controlDire.text = widget.cliente!.direccion;
     _controlTele.text = widget.cliente!.telefono;
-    return Scaffold(
-      extendBodyBehindAppBar: false,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
-        child: AppBarGen(widget.nombreCli, widget.pasoDatosGim!.nombre),
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(20),
-        children: <Widget>[
-          consTop(),
-          consContenido(),
-          SizedBox(
-            height: 20,
-          ),
-          Card(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-            elevation: 10,
-            child: Form(
-              key: _formkey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                    child: Column(
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: false,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80),
+          child: AppBarGen(widget.nombreCli, widget.pasoDatosGim!.nombre),
+        ),
+        body: ListView(
+          padding: EdgeInsets.all(20),
+          children: <Widget>[
+            consTop(),
+            consContenido(),
+            SizedBox(
+              height: 20,
+            ),
+            Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              elevation: 10,
+              child: Form(
+                key: _formkey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                      child: Column(
+                        children: [
+                          _crearCampoNombre(),
+                          _crearCampoApellido(),
+                          _crearCampoDni(),
+                          _crearCampoDireccion(),
+                          _crearCampoTelefono()
+                        ],
+                      ),
+                    ),
+                    ButtonBar(
+                      alignment: MainAxisAlignment.end,
                       children: [
-                        _crearCampoNombre(),
-                        _crearCampoApellido(),
-                        _crearCampoDni(),
-                        _crearCampoDireccion(),
-                        _crearCampoTelefono()
+                        TextButton(
+                            onPressed: () {
+                              if (!_formkey.currentState!.validate()) {
+                                return;
+                              } else {
+                                actualizar(
+                                    widget.cliente!,
+                                    _controlNombre.text,
+                                    _controlApellido.text,
+                                    _controlDni.text,
+                                    _controlDire.text,
+                                    _controlTele.text);
+                              }
+                            },
+                            child: Text("Guardar Cambios"))
                       ],
                     ),
-                  ),
-                  ButtonBar(
-                    alignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                          onPressed: () {
-                            if (!_formkey.currentState!.validate()) {
-                              return;
-                            } else {
-                              actualizar(
-                                  widget.cliente!,
-                                  _controlNombre.text,
-                                  _controlApellido.text,
-                                  _controlDni.text,
-                                  _controlDire.text,
-                                  _controlTele.text);
-                            }
-                          },
-                          child: Text("Guardar Cambios"))
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

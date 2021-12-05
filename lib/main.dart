@@ -9,6 +9,7 @@ import 'package:tuturnoapp/Paginas/olvide_pass.dart';
 import 'package:tuturnoapp/Paginas/perfilClientes.dart';
 import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'package:tuturnoapp/Paginas/codigoAcceso.dart';
+import 'package:tuturnoapp/Paginas/turnosAdmin.dart';
 import 'package:tuturnoapp/Widgets/progressDialog.dart';
 import 'Paginas/perfilAdmin.dart';
 import 'Paginas/user_principal.dart';
@@ -69,6 +70,7 @@ class App extends StatelessWidget {
               nombreCli: '',
             ),
         '/login': (context) => PantallaLogin(),
+        '/turnosAdmin': (context) => TurnosAdmin(),
         '/perfilClientes': (context) => PerfilClientes(
               cliente: null,
               pasoDatosGim: null,
@@ -170,40 +172,42 @@ class _DespuesDeSplashState extends State<DespuesDeSplash> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('tu Turno'),
-        ),
-        body: Container(
-          child: Column(children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: TextField(
-                onChanged: (value) {},
-                controller: _busquedaControl,
-                decoration: InputDecoration(
-                  labelText: "Buscar",
-                  hintText: "Buscar",
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text('tu Turno'),
+          ),
+          body: Container(
+            child: Column(children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: TextField(
+                  onChanged: (value) {},
+                  controller: _busquedaControl,
+                  decoration: InputDecoration(
+                    labelText: "Buscar",
+                    hintText: "Buscar",
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              "Selecciona tu gimnasio",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-                child: ListView.builder(
-              itemCount: listaResultados.length,
-              itemBuilder: (BuildContext context, int index) =>
-                  crearListaCard(context, listaResultados[index]),
-            )),
-          ]),
-        ));
+              SizedBox(height: 5),
+              Text(
+                "Selecciona tu gimnasio",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Expanded(
+                  child: ListView.builder(
+                itemCount: listaResultados.length,
+                itemBuilder: (BuildContext context, int index) =>
+                    crearListaCard(context, listaResultados[index]),
+              )),
+            ]),
+          )),
+    );
   }
 }
 

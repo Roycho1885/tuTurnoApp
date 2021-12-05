@@ -86,101 +86,103 @@ class _PerfilAdministrador extends State<PerfilAdministrador> {
       return bandera ? _urlFotoWeb : _urlFotoAndroid;
     }
 
-    return Scaffold(
-      extendBodyBehindAppBar: false,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
-        child: AppBarGen(widget.nombreCli, widget.nombreGym),
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(20),
-        children: <Widget>[
-          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-            stream: getUsuarios(widget.nombreGym!, widget.idDoc!),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                print(snapshot.error);
-                return Text('Algo anda mal...Reintenta');
-              }
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.amber,
-                  ),
-                );
-              }
-              if (snapshot.hasData) {
-                var data = snapshot.data!;
-                final datosCliente = Cliente.fromSnapshot(data);
-                _controlNombre.text = data['nombre'];
-                _controlApellido.text = data['apellido'];
-                _controlDni.text = data['dni'];
-                _controlDire.text = data['direccion'];
-                _controlTele.text = data['telefono'];
-                return Column(
-                  children: <Widget>[
-                    consTop(data['imgperfil'], getImagen),
-                    consContenido(data['nombre'], data['email']),
-                    SizedBox(height: 10),
-                    Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                      elevation: 10,
-                      child: Form(
-                        key: _formkey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(
-                                  left: 10, right: 10, bottom: 10),
-                              child: Column(
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: false,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80),
+          child: AppBarGen(widget.nombreCli, widget.nombreGym),
+        ),
+        body: ListView(
+          padding: EdgeInsets.all(20),
+          children: <Widget>[
+            StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+              stream: getUsuarios(widget.nombreGym!, widget.idDoc!),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  print(snapshot.error);
+                  return Text('Algo anda mal...Reintenta');
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.amber,
+                    ),
+                  );
+                }
+                if (snapshot.hasData) {
+                  var data = snapshot.data!;
+                  final datosCliente = Cliente.fromSnapshot(data);
+                  _controlNombre.text = data['nombre'];
+                  _controlApellido.text = data['apellido'];
+                  _controlDni.text = data['dni'];
+                  _controlDire.text = data['direccion'];
+                  _controlTele.text = data['telefono'];
+                  return Column(
+                    children: <Widget>[
+                      consTop(data['imgperfil'], getImagen),
+                      consContenido(data['nombre'], data['email']),
+                      SizedBox(height: 10),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10))),
+                        elevation: 10,
+                        child: Form(
+                          key: _formkey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(
+                                    left: 10, right: 10, bottom: 10),
+                                child: Column(
+                                  children: [
+                                    _crearCampoNombre(),
+                                    _crearCampoApellido(),
+                                    _crearCampoDni(),
+                                    _crearCampoDireccion(),
+                                    _crearCampoTelefono()
+                                  ],
+                                ),
+                              ),
+                              ButtonBar(
+                                alignment: MainAxisAlignment.end,
                                 children: [
-                                  _crearCampoNombre(),
-                                  _crearCampoApellido(),
-                                  _crearCampoDni(),
-                                  _crearCampoDireccion(),
-                                  _crearCampoTelefono()
+                                  TextButton(
+                                      onPressed: () {
+                                        if (!_formkey.currentState!.validate()) {
+                                          return;
+                                        } else {
+                                          subirImgPerfil().then((value) => {
+                                                actualizar(
+                                                    datosCliente,
+                                                    _controlNombre.text,
+                                                    _controlApellido.text,
+                                                    _controlDni.text,
+                                                    _controlDire.text,
+                                                    _controlTele.text,
+                                                    value),
+                                              });
+                                        }
+                                      },
+                                      child: Text("Guardar Cambios"))
                                 ],
                               ),
-                            ),
-                            ButtonBar(
-                              alignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                    onPressed: () {
-                                      if (!_formkey.currentState!.validate()) {
-                                        return;
-                                      } else {
-                                        subirImgPerfil().then((value) => {
-                                              actualizar(
-                                                  datosCliente,
-                                                  _controlNombre.text,
-                                                  _controlApellido.text,
-                                                  _controlDni.text,
-                                                  _controlDire.text,
-                                                  _controlTele.text,
-                                                  value),
-                                            });
-                                      }
-                                    },
-                                    child: Text("Guardar Cambios"))
-                              ],
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              }
-              return Center(
-                  child: CircularProgressIndicator(
-                color: Colors.amber,
-              ));
-            },
-          ),
-        ],
+                    ],
+                  );
+                }
+                return Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.amber,
+                ));
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

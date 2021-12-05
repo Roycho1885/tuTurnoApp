@@ -23,39 +23,41 @@ class _Clientes extends State<Clientes> {
   String nombreCli = '';
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: false,
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
-          child: AppBarGen(widget.nombreCli, widget.pasoDatosGim!.nombre)),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(15),
-              child: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    nombreCli = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: "Buscar",
-                  hintText: "Buscar",
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: false,
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(80),
+            child: AppBarGen(widget.nombreCli, widget.pasoDatosGim!.nombre)),
+        body: Container(
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(15),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      nombreCli = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: "Buscar",
+                    hintText: "Buscar",
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Expanded(
-              child: construirCuerpoListado(context),
-            )
-          ],
+              SizedBox(
+                height: 10,
+              ),
+              Expanded(
+                child: construirCuerpoListado(context),
+              )
+            ],
+          ),
         ),
       ),
     );
