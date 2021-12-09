@@ -26,10 +26,10 @@ dependencies:
   rflutter_alert: ^2.0.4
   image_picker: ^0.8.4+4
   firebase_storage: ^10.1.0
+  provider: ^6.0.1
   
 
   cupertino_icons: ^1.0.3
-  provider: ^6.0.1
   
   
 

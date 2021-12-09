@@ -157,6 +157,8 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (_) => TurnosAdmin(
+                                              pasoDatosGim: widget.pasoDatosGim,
+                                              nombreCli: nombreDelCli,
                                             )));
                               },
                               child: Card(
@@ -319,22 +321,23 @@ class _PrincipalAdminState extends State<PrincipalAdmin> {
                               ),
                             ),
                           ],
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: (_width > 1000)
-                                  ? 4
-                                  : (_width > 750)
-                                      ? 3
-                                      : 2,
-                              mainAxisSpacing: (_width > 750)
-                                  ? 80
-                                  : (_width < 750)
-                                      ? 30
-                                      : 20,
-                              crossAxisSpacing: (_width > 750)
-                                  ? 80
-                                  : (_width < 750)
-                                      ? 30
-                                      : 20),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: (_width > 1000)
+                                      ? 4
+                                      : (_width > 750)
+                                          ? 3
+                                          : 2,
+                                  mainAxisSpacing: (_width > 750)
+                                      ? 80
+                                      : (_width < 750)
+                                          ? 30
+                                          : 20,
+                                  crossAxisSpacing: (_width > 750)
+                                      ? 80
+                                      : (_width < 750)
+                                          ? 30
+                                          : 20),
                         ),
                       ),
                     ),

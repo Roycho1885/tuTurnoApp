@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
 import 'package:tuturnoapp/Paginas/admin_principal.dart';
@@ -11,6 +14,7 @@ import 'package:tuturnoapp/Paginas/registrar.dart';
 import 'package:tuturnoapp/Paginas/codigoAcceso.dart';
 import 'package:tuturnoapp/Paginas/turnosAdmin.dart';
 import 'package:tuturnoapp/Widgets/progressDialog.dart';
+import 'Modelo/notifier.dart';
 import 'Paginas/perfilAdmin.dart';
 import 'Paginas/user_principal.dart';
 import 'package:flutter/services.dart';
@@ -24,7 +28,12 @@ Future<void> main() async {
   );
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(App());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => MultipleNoti([])),
+    ],
+  child: App(),
+  ));
 }
 
 class App extends StatelessWidget {
@@ -70,7 +79,10 @@ class App extends StatelessWidget {
               nombreCli: '',
             ),
         '/login': (context) => PantallaLogin(),
-        '/turnosAdmin': (context) => TurnosAdmin(),
+        '/turnosAdmin': (context) => TurnosAdmin(
+          pasoDatosGim: null,
+          nombreCli: '',
+        ),
         '/perfilClientes': (context) => PerfilClientes(
               cliente: null,
               pasoDatosGim: null,

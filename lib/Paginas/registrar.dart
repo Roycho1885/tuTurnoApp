@@ -503,7 +503,7 @@ Future<void> registrar(nombre, apellido, dni, direccion, telefono, email,
         .collection('Gimnasios')
         .doc(nombregym)
         .collection("Clientes")
-        .doc()
+        .doc(clienteNuevo.apellido +'/'+ clienteNuevo.nombre)
         .set(clienteNuevo.toJson())
         .then((value) => ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Cliente registrado con éxito')))));
