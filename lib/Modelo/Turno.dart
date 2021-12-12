@@ -1,19 +1,21 @@
 class Turno {
-  String _id;
-  String _horacomienzo;
   String _disciplina;
+  String _horacomienzo;
   String _cupo;
   String _cupoalmacenado;
   String _dias;
-  int _foto;
+  String _entrenador;
 
-  Turno(this._id, this._horacomienzo, this._disciplina, this._cupo,
-      this._cupoalmacenado, this._dias, this._foto);
+  Turno(this._disciplina, this._horacomienzo, this._cupo, this._cupoalmacenado,
+      this._dias, this._entrenador);
 
-
-  set id(String id) {
-    this._id = id;
-  }
+  Map<String, dynamic> toJson() => {
+        'disciplina': _disciplina,
+        'horacomienzo': _horacomienzo,
+        'cupo': _cupo,
+        'cupoalmacenado': _cupoalmacenado,
+        'dias': _dias,
+      };
 
   set horacomienzo(String horacomienzo) {
     this._horacomienzo = horacomienzo;
@@ -35,17 +37,16 @@ class Turno {
     this._dias = dias;
   }
 
-  set foto(int foto) {
-    this._foto = foto;
+  set entrenador(String entrenador) {
+    this._entrenador = entrenador;
   }
 
-  String get id => this._id;
   String get horacomienzo => this._horacomienzo;
   String get disciplina => this._disciplina;
   String get cupo => this._cupo;
   String get cupoalmacenado => this._cupoalmacenado;
   String get dias => this._dias;
-  int get foto => this._foto;
+  String get entrenador => this._entrenador;
 
   String toString() =>
       "Hora " +

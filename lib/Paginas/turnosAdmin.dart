@@ -1,7 +1,9 @@
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
+import 'package:tuturnoapp/Modelo/Turno.dart';
 import 'package:tuturnoapp/Modelo/datosDiasCheck.dart';
 import 'package:tuturnoapp/Modelo/notifier.dart';
 import 'package:tuturnoapp/Widgets/appBar.dart';
@@ -19,11 +21,14 @@ class TurnosAdmin extends StatefulWidget {
 }
 
 class _TurnosAdminState extends State<TurnosAdmin> {
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController _controlDias = TextEditingController();
   TextEditingController _controlHora = TextEditingController();
+  TextEditingController _controlDisciplina = TextEditingController();
+  TextEditingController _controlEntre = TextEditingController();
+  TextEditingController _controlCupo = TextEditingController();
   //TIME PICKER PARA TOMAR LA HORA DEL TURNO
   TimeOfDay horaselec = TimeOfDay.now();
-  String _hora = '';
   List<String> datosOrdenados = [];
 
   Future<TimeOfDay?> _horaseleccion(BuildContext context) async {
@@ -48,6 +53,10 @@ class _TurnosAdminState extends State<TurnosAdmin> {
   void dispose() {
     // Clean up the controller when the widget is disposed.
     _controlDias.dispose();
+    _controlHora.dispose();
+    _controlCupo.dispose();
+    _controlDisciplina.dispose();
+    _controlEntre.dispose();
     super.dispose();
   }
 
@@ -66,38 +75,6 @@ class _TurnosAdminState extends State<TurnosAdmin> {
     );
   }
 
-  /* Widget crearWidgetCheckBox(CheckboxState check) {
-    return CheckboxListTile(
-      controlAffinity: ListTileControlAffinity.leading,
-      activeColor: Colors.amber,
-      value: check.value,
-      title: Text(check.titulo, style: TextStyle(fontWeight: FontWeight.bold)),
-      onChanged: (value) {
-        setState(() {
-          check.value = value!;
-        });
-      },
-    );
-  }
-
-  Future<void> mostrarDialogo(BuildContext context) async {
-    return await showDialog(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(builder: (context, setState) {
-            return AlertDialog(
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: [
-                    ...diasSemana.map(crearWidgetCheckBox).toList(),
-                  ],
-                ),
-              ),
-            );
-          });
-        });
-  } */
-
   Widget crearWidgetPrincipal() {
     return SingleChildScrollView(
       child: Column(
@@ -111,18 +88,33 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: Form(
+                      key: _formkey,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text('Ingrese Disciplina',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           TextFormField(
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Ingrese Disciplina';
+                              }
+                              return null;
+                            },
+                            controller: _controlDisciplina,
                             decoration: InputDecoration(
                               labelText: 'Disciplina',
                               prefixIcon: Icon(Icons.directions_walk),
                             ),
                           ),
+                          SizedBox(height: 5),
                           TextFormField(
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Ingrese Horario';
+                              }
+                              return null;
+                            },
                             controller: _controlHora,
                             readOnly: true,
                             onTap: () {
@@ -135,7 +127,14 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                               prefixIcon: Icon(Icons.access_time),
                             ),
                           ),
+                          SizedBox(height: 5),
                           TextFormField(
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Ingrese Días';
+                              }
+                              return null;
+                            },
                             controller: _controlDias,
                             readOnly: true,
                             onTap: () => {_mostrarDialogo(context)},
@@ -144,7 +143,15 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                               prefixIcon: Icon(Icons.date_range),
                             ),
                           ),
+                          SizedBox(height: 5),
                           TextFormField(
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Ingrese Cupo';
+                              }
+                              return null;
+                            },
+                            controller: _controlCupo,
                             maxLength: 2,
                             keyboardType: TextInputType.number,
                             inputFormatters: [
@@ -156,7 +163,15 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                               prefixIcon: Icon(Icons.wc),
                             ),
                           ),
+                          SizedBox(height: 5),
                           TextFormField(
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Ingrese Entrenador/a';
+                              }
+                              return null;
+                            },
+                            controller: _controlEntre,
                             decoration: InputDecoration(
                               labelText: 'Entrenador/a',
                               prefixIcon: Icon(Icons.wc),
@@ -166,7 +181,18 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                             alignment: MainAxisAlignment.end,
                             children: [
                               TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (!_formkey.currentState!.validate()) {
+                                    return;
+                                  }
+                                  registrarTurno(
+                                      _controlDisciplina.text,
+                                      _controlHora.text,
+                                      _controlDias.text,
+                                      _controlCupo.text,
+                                      _controlCupo.text,
+                                      _controlEntre.text);
+                                },
                                 child: Text('Guardar Cambios'),
                               ),
                             ],
@@ -309,5 +335,35 @@ class _TurnosAdminState extends State<TurnosAdmin> {
     _controlDias.text =
         datosOrdenados.toString().replaceAll('[', '').replaceAll(']', '');
     Navigator.of(context).pop();
+  }
+
+  Future<void> registrarTurno(
+      disciplina, horario, dias, cupo, cupoalmacenado, entrenador) async {
+    final turnoNuevo = Turno(
+        disciplina = disciplina,
+        horario = horario,
+        dias = dias,
+        cupo = cupo,
+        cupoalmacenado = cupo,
+        entrenador = entrenador);
+
+    CollectionReference turnoNuevoReferencia =
+        FirebaseFirestore.instance.collection('clientesList');
+
+    try {
+      return FirebaseFirestore.instance.runTransaction((transaction) =>
+          turnoNuevoReferencia
+              .doc('Gimnasios')
+              .collection('Gimnasios')
+              .doc(widget.pasoDatosGim!.nombre)
+              .collection('Turnos')
+              .doc('TurnosAdmin')
+              .set(turnoNuevo.toJson())
+              .then((value) => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Turno almacenado con éxito')))));
+    } on FirebaseException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ocurrieron errores ' + e.toString())));
+    }
   }
 }
