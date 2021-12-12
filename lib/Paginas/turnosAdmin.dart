@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tuturnoapp/Modelo/Gimnasios.dart';
@@ -20,9 +19,12 @@ class TurnosAdmin extends StatefulWidget {
 }
 
 class _TurnosAdminState extends State<TurnosAdmin> {
+  TextEditingController _controlDias = TextEditingController();
+  TextEditingController _controlHora = TextEditingController();
   //TIME PICKER PARA TOMAR LA HORA DEL TURNO
   TimeOfDay horaselec = TimeOfDay.now();
   String _hora = '';
+  List<String> datosOrdenados = [];
 
   Future<TimeOfDay?> _horaseleccion(BuildContext context) async {
     final TimeOfDay? pick = await showTimePicker(
@@ -37,9 +39,16 @@ class _TurnosAdminState extends State<TurnosAdmin> {
 
     if (pick != null) {
       setState(() {
-        _hora = pick.format(context);
+        _controlHora.text = pick.format(context);
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    _controlDias.dispose();
+    super.dispose();
   }
 
   @override
@@ -114,6 +123,7 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                             ),
                           ),
                           TextFormField(
+                            controller: _controlHora,
                             readOnly: true,
                             onTap: () {
                               setState(() {
@@ -122,19 +132,20 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                             },
                             decoration: InputDecoration(
                               labelText: 'Horario',
-                              hintText: _hora,
                               prefixIcon: Icon(Icons.access_time),
                             ),
                           ),
                           TextFormField(
+                            controller: _controlDias,
                             readOnly: true,
-                            onTap: () => _mostrarDialogo(context),
+                            onTap: () => {_mostrarDialogo(context)},
                             decoration: InputDecoration(
                               labelText: 'Dias',
                               prefixIcon: Icon(Icons.date_range),
                             ),
                           ),
                           TextFormField(
+                            maxLength: 2,
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
@@ -209,6 +220,11 @@ class _TurnosAdminState extends State<TurnosAdmin> {
     );
   }
 
+  quitarChek(MultipleNoti prov, String a, String b) {
+    prov.removerItem(a);
+    prov.removerItem(b);
+  }
+
   _mostrarDialogo(BuildContext context) => showDialog(
       context: context,
       builder: (context) {
@@ -225,8 +241,6 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                       .map((e) => CheckboxListTile(
                             activeColor: Colors.amber,
                             title: Text(e),
-                            //CONTINUAR ACA. FALTA DESELECCIONAR BOTON SELECCIONAR TODOS CUANDO SE
-                            //APRETA ALGUN DIA EN PARTICULAR
                             onChanged: (value) {
                               value == true && e == 'Seleccionar todos'
                                   ? dias.forEach((element) {
@@ -239,7 +253,13 @@ class _TurnosAdminState extends State<TurnosAdmin> {
                                               _multipleNotifier
                                                   .removerItem(element);
                                             })
-                                          : _multipleNotifier.removerItem(e);
+                                          : _multipleNotifier.itemsSeleccionados
+                                                      .length ==
+                                                  6
+                                              ? quitarChek(_multipleNotifier,
+                                                  'Seleccionar todos', e)
+                                              : _multipleNotifier
+                                                  .removerItem(e);
                             },
                             value: _multipleNotifier.siTieneItem(e),
                           ))
@@ -254,10 +274,40 @@ class _TurnosAdminState extends State<TurnosAdmin> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text('Ok'),
-              onPressed: () => (print(_multipleNotifier.itemsSeleccionados)),
-            ),
+                child: Text('Ok'),
+                onPressed: () => funcionOrdenar(_multipleNotifier)),
           ],
         );
       });
+
+  funcionOrdenar(MultipleNoti pro) {
+    bool testTodos = false;
+    datosOrdenados.clear();
+    List<String> datos = List.from(pro.itemsSeleccionados);
+    if (datos.contains('Seleccionar todos')) {
+      testTodos = true;
+    }
+    if (datos.contains('Lunes')) {
+      datosOrdenados.add('Lunes');
+    }
+    if (datos.contains('Martes')) {
+      datosOrdenados.add('Martes');
+    }
+    if (datos.contains('Miércoles')) {
+      datosOrdenados.add('Miércoles');
+    }
+    if (datos.contains('Jueves')) {
+      datosOrdenados.add('Jueves');
+    }
+    if (datos.contains('Viernes')) {
+      datosOrdenados.add('Viernes');
+    }
+    if (testTodos) {
+      datosOrdenados.clear();
+      datosOrdenados.add('Todos');
+    }
+    _controlDias.text =
+        datosOrdenados.toString().replaceAll('[', '').replaceAll(']', '');
+    Navigator.of(context).pop();
+  }
 }
